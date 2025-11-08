@@ -145,6 +145,11 @@ p {
     color: var(--gray-700);
 }
 
+/* Ensure error messages display in red and override global p styles */
+p.text-red-600 {
+    color: #dc2626 !important;
+}
+
 /* Glassmorphism effect */
 .glass-effect {
     background: rgba(255, 255, 255, 0.9);
