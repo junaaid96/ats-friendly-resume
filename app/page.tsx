@@ -2,6 +2,10 @@ import { Resume } from "@/types/resume";
 import Link from "next/link";
 import { getAllResumes } from "@/lib/storage";
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 async function getResumes(): Promise<Resume[]> {
     try {
         const resumes = await getAllResumes();

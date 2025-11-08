@@ -4,6 +4,10 @@ import ShareResume from '@/components/ShareResume';
 import PrintButton from '@/components/PrintButton';
 import { getResumeById } from '@/lib/storage';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 async function getResume(id: string): Promise<Resume | null> {
   try {
     const resume = await getResumeById(id);

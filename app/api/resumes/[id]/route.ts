@@ -17,7 +17,13 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(resume);
+    return NextResponse.json(resume, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
+    });
   } catch (error) {
     console.error('Error fetching resume:', error);
     return NextResponse.json(
@@ -37,7 +43,13 @@ export async function PUT(
     resume.id = id;
 
     const savedResume = await saveResume(resume);
-    return NextResponse.json(savedResume);
+    return NextResponse.json(savedResume, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
+    });
   } catch (error) {
     console.error('Error updating resume:', error);
     return NextResponse.json(
@@ -62,7 +74,16 @@ export async function DELETE(
       );
     }
 
-    return NextResponse.json({ message: 'Resume deleted successfully' });
+    return NextResponse.json(
+      { message: 'Resume deleted successfully' },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        },
+      }
+    );
   } catch (error) {
     console.error('Error deleting resume:', error);
     return NextResponse.json(

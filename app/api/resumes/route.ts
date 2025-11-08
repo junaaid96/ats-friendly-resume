@@ -5,7 +5,13 @@ import { Resume } from '@/types/resume';
 export async function GET() {
   try {
     const resumes = await getAllResumes();
-    return NextResponse.json(resumes);
+    return NextResponse.json(resumes, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
+    });
   } catch (error) {
     console.error('Error fetching resumes:', error);
     return NextResponse.json(
@@ -25,7 +31,14 @@ export async function POST(request: NextRequest) {
     }
 
     const savedResume = await saveResume(resume);
-    return NextResponse.json(savedResume, { status: 201 });
+    return NextResponse.json(savedResume, {
+      status: 201,
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
+    });
   } catch (error) {
     console.error('Error creating resume:', error);
     return NextResponse.json(
