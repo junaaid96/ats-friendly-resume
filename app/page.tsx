@@ -1,19 +1,11 @@
 import { Resume } from "@/types/resume";
 import Link from "next/link";
+import { getAllResumes } from "@/lib/storage";
 
 async function getResumes(): Promise<Resume[]> {
     try {
-        const baseUrl =
-            process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-        const response = await fetch(`${baseUrl}/api/resumes`, {
-            cache: "no-store",
-        });
-
-        if (!response.ok) {
-            return [];
-        }
-
-        return response.json();
+        const resumes = await getAllResumes();
+        return resumes;
     } catch (error) {
         console.error("Error fetching resumes:", error);
         return [];

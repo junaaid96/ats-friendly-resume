@@ -23,18 +23,35 @@ if (!USE_POSTGRES) {
 
 // Helper function to convert database row to Resume object
 function rowToResume(row: any): Resume {
-  return {
-    id: row.id,
-    personalInfo: row.personal_info,
-    summary: row.summary,
-    experience: row.experience || [],
-    education: row.education || [],
-    skills: row.skills || [],
-    projects: row.projects || [],
-    certifications: row.certifications || [],
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  };
+  try {
+    // Ensure JSONB fields are properly parsed (Vercel Postgres should handle this, but be safe)
+    const parseJsonb = (value: any) => {
+      if (typeof value === 'string') {
+        try {
+          return JSON.parse(value);
+        } catch {
+          return value;
+        }
+      }
+      return value;
+    };
+
+    return {
+      id: row.id,
+      personalInfo: parseJsonb(row.personal_info),
+      summary: row.summary || '',
+      experience: parseJsonb(row.experience) || [],
+      education: parseJsonb(row.education) || [],
+      skills: parseJsonb(row.skills) || [],
+      projects: parseJsonb(row.projects) || [],
+      certifications: parseJsonb(row.certifications) || [],
+      createdAt: row.created_at || new Date().toISOString(),
+      updatedAt: row.updated_at || new Date().toISOString(),
+    };
+  } catch (error) {
+    console.error('Error converting row to resume:', error, 'Row data:', row);
+    throw error;
+  }
 }
 
 // Postgres implementation
@@ -70,9 +87,18 @@ export async function getResumeById(id: string): Promise<Resume | null> {
         WHERE id = ${id}
         LIMIT 1
       `;
-      return rows.length > 0 ? rowToResume(rows[0]) : null;
+      
+      if (rows.length === 0) {
+        console.log(`Resume with id "${id}" not found in database`);
+        return null;
+      }
+      
+      const resume = rowToResume(rows[0]);
+      console.log(`Successfully fetched resume with id "${id}"`);
+      return resume;
     } catch (error) {
       console.error('Error fetching resume from Postgres:', error);
+      console.error('Resume ID:', id);
       return null;
     }
   } else {

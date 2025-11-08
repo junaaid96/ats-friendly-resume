@@ -2,19 +2,12 @@ import { Resume } from '@/types/resume';
 import Link from 'next/link';
 import ShareResume from '@/components/ShareResume';
 import PrintButton from '@/components/PrintButton';
+import { getResumeById } from '@/lib/storage';
 
 async function getResume(id: string): Promise<Resume | null> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/resumes/${id}`, {
-      cache: 'no-store',
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    return response.json();
+    const resume = await getResumeById(id);
+    return resume;
   } catch (error) {
     console.error('Error fetching resume:', error);
     return null;
