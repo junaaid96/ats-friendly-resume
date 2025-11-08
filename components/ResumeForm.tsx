@@ -3,11 +3,8 @@
 import { useState } from 'react';
 import { Resume, WorkExperience, Education, Project, Certification } from '@/types/resume';
 import { useRouter } from 'next/navigation';
-<<<<<<< Updated upstream
-=======
 import Link from 'next/link';
 import { showToast } from '@/components/Toast';
->>>>>>> Stashed changes
 
 export default function ResumeForm() {
   const router = useRouter();
