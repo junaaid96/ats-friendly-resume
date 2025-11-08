@@ -201,7 +201,7 @@ export default async function ResumePage({
                 Projects
               </h3>
               {resume.projects.map((project, idx) => (
-                <div key={project.id} className={idx < resume.projects.length - 1 ? "mb-2 print:mb-1.5" : "mb-0"}>
+                <div key={project.id} className={idx < (resume.projects?.length ?? 0) - 1 ? "mb-2 print:mb-1.5" : "mb-0"}>
                   <h3 className="font-bold text-sm print:text-xs text-black leading-tight">
                     {project.name}
                     {project.link && (
@@ -236,7 +236,7 @@ export default async function ResumePage({
                 Certifications
               </h3>
               {resume.certifications.map((cert, idx) => (
-                <div key={cert.id} className={idx < resume.certifications.length - 1 ? "mb-1.5 print:mb-1" : "mb-0"}>
+                <div key={cert.id} className={idx < (resume.certifications?.length ?? 0) - 1 ? "mb-1.5 print:mb-1" : "mb-0"}>
                   <div className="flex justify-between items-start gap-2">
                     <div className="flex-1 min-w-0">
                       <h3 className="font-bold text-sm print:text-xs text-black leading-tight">{cert.name}</h3>
