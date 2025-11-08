@@ -190,18 +190,31 @@ export default function ResumeForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-4xl mx-auto p-6 space-y-8">
-      <h1 className="text-3xl font-bold">Create ATS-Friendly Resume</h1>
+    <div className="min-h-screen bg-gradient-to-br from-red-50 via-rose-50 to-red-50 py-12 px-6">
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-10">
+          <div className="inline-block mb-4">
+            <span className="bg-red-100 text-red-700 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase">
+              ATS Friendly Resume Builder
+            </span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3 tracking-tight">
+            Create Your <span className="text-red-600">Resume</span>
+          </h1>
+          <p className="text-gray-600 text-base font-light">Fill in your professional information below</p>
+        </div>
+
+    <form onSubmit={handleSubmit} className="space-y-6">
 
       {/* Personal Information */}
-      <section className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-2xl font-semibold mb-4">Personal Information</h2>
+      <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <h2 className="text-xl font-semibold mb-4 text-gray-900">Personal Information</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input
             type="text"
             placeholder="Full Name *"
             required
-            className="border p-2 rounded"
+            className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors"
             value={resume.personalInfo?.fullName}
             onChange={(e) =>
               setResume({
@@ -214,7 +227,7 @@ export default function ResumeForm() {
             type="email"
             placeholder="Email *"
             required
-            className="border p-2 rounded"
+            className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors"
             value={resume.personalInfo?.email}
             onChange={(e) =>
               setResume({
@@ -227,7 +240,7 @@ export default function ResumeForm() {
             type="tel"
             placeholder="Phone *"
             required
-            className="border p-2 rounded"
+            className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors"
             value={resume.personalInfo?.phone}
             onChange={(e) =>
               setResume({
@@ -240,7 +253,7 @@ export default function ResumeForm() {
             type="text"
             placeholder="Location *"
             required
-            className="border p-2 rounded"
+            className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors"
             value={resume.personalInfo?.location}
             onChange={(e) =>
               setResume({
@@ -252,7 +265,7 @@ export default function ResumeForm() {
           <input
             type="url"
             placeholder="LinkedIn (optional)"
-            className="border p-2 rounded"
+            className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors"
             value={resume.personalInfo?.linkedin}
             onChange={(e) =>
               setResume({
@@ -264,7 +277,7 @@ export default function ResumeForm() {
           <input
             type="url"
             placeholder="Website (optional)"
-            className="border p-2 rounded"
+            className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors"
             value={resume.personalInfo?.website}
             onChange={(e) =>
               setResume({
@@ -276,7 +289,7 @@ export default function ResumeForm() {
           <input
             type="url"
             placeholder="GitHub (optional)"
-            className="border p-2 rounded md:col-span-2"
+            className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors md:col-span-2"
             value={resume.personalInfo?.github}
             onChange={(e) =>
               setResume({
@@ -289,42 +302,42 @@ export default function ResumeForm() {
       </section>
 
       {/* Summary */}
-      <section className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-2xl font-semibold mb-4">Professional Summary</h2>
+      <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <h2 className="text-xl font-semibold mb-4 text-gray-900">Professional Summary</h2>
         <textarea
           placeholder="Write a brief professional summary (2-3 sentences) *"
           required
           rows={4}
-          className="w-full border p-2 rounded"
+          className="w-full border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors resize-none"
           value={resume.summary}
           onChange={(e) => setResume({ ...resume, summary: e.target.value })}
         />
       </section>
 
       {/* Work Experience */}
-      <section className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-2xl font-semibold mb-4">Work Experience</h2>
+      <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <h2 className="text-xl font-semibold mb-4 text-gray-900">Work Experience</h2>
         {resume.experience?.map((exp, index) => (
-          <div key={exp.id} className="mb-6 p-4 border rounded">
+          <div key={exp.id} className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <input
                 type="text"
                 placeholder="Company"
-                className="border p-2 rounded"
+                className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors"
                 value={exp.company}
                 onChange={(e) => updateExperience(index, 'company', e.target.value)}
               />
               <input
                 type="text"
                 placeholder="Position"
-                className="border p-2 rounded"
+                className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors"
                 value={exp.position}
                 onChange={(e) => updateExperience(index, 'position', e.target.value)}
               />
               <input
                 type="text"
                 placeholder="Location"
-                className="border p-2 rounded"
+                className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors"
                 value={exp.location}
                 onChange={(e) => updateExperience(index, 'location', e.target.value)}
               />
@@ -332,14 +345,14 @@ export default function ResumeForm() {
                 <input
                   type="month"
                   placeholder="Start Date"
-                  className="border p-2 rounded flex-1"
+                  className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors flex-1"
                   value={exp.startDate}
                   onChange={(e) => updateExperience(index, 'startDate', e.target.value)}
                 />
                 <input
                   type="month"
                   placeholder="End Date"
-                  className="border p-2 rounded flex-1"
+                  className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors flex-1"
                   value={exp.endDate}
                   onChange={(e) => updateExperience(index, 'endDate', e.target.value)}
                   disabled={exp.current}
@@ -361,7 +374,7 @@ export default function ResumeForm() {
                   key={respIndex}
                   type="text"
                   placeholder="Responsibility/Achievement"
-                  className="w-full border p-2 rounded"
+                  className="w-full border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors"
                   value={resp}
                   onChange={(e) => updateResponsibility(index, respIndex, e.target.value)}
                 />
@@ -369,7 +382,7 @@ export default function ResumeForm() {
               <button
                 type="button"
                 onClick={() => addResponsibility(index)}
-                className="text-blue-600 hover:underline text-sm"
+                className="text-red-600 hover:text-red-700 text-sm font-medium"
               >
                 + Add Responsibility
               </button>
@@ -377,7 +390,7 @@ export default function ResumeForm() {
             <button
               type="button"
               onClick={() => removeExperience(index)}
-              className="mt-4 text-red-600 hover:underline text-sm"
+              className="mt-4 text-red-600 hover:text-red-700 hover:underline text-sm font-medium"
             >
               Remove Experience
             </button>
@@ -386,64 +399,64 @@ export default function ResumeForm() {
         <button
           type="button"
           onClick={addExperience}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-red-600 text-white px-4 py-2.5 rounded-lg hover:bg-red-700 transition-colors font-medium text-sm"
         >
           + Add Work Experience
         </button>
       </section>
 
       {/* Education */}
-      <section className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-2xl font-semibold mb-4">Education</h2>
+      <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <h2 className="text-xl font-semibold mb-4 text-gray-900">Education</h2>
         {resume.education?.map((edu, index) => (
-          <div key={edu.id} className="mb-6 p-4 border rounded">
+          <div key={edu.id} className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <input
                 type="text"
                 placeholder="Institution"
-                className="border p-2 rounded"
+                className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors"
                 value={edu.institution}
                 onChange={(e) => updateEducation(index, 'institution', e.target.value)}
               />
               <input
                 type="text"
                 placeholder="Degree"
-                className="border p-2 rounded"
+                className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors"
                 value={edu.degree}
                 onChange={(e) => updateEducation(index, 'degree', e.target.value)}
               />
               <input
                 type="text"
                 placeholder="Field of Study"
-                className="border p-2 rounded"
+                className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors"
                 value={edu.field}
                 onChange={(e) => updateEducation(index, 'field', e.target.value)}
               />
               <input
                 type="text"
                 placeholder="Location"
-                className="border p-2 rounded"
+                className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors"
                 value={edu.location}
                 onChange={(e) => updateEducation(index, 'location', e.target.value)}
               />
               <input
                 type="month"
                 placeholder="Start Date"
-                className="border p-2 rounded"
+                className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors"
                 value={edu.startDate}
                 onChange={(e) => updateEducation(index, 'startDate', e.target.value)}
               />
               <input
                 type="month"
                 placeholder="End Date"
-                className="border p-2 rounded"
+                className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors"
                 value={edu.endDate}
                 onChange={(e) => updateEducation(index, 'endDate', e.target.value)}
               />
               <input
                 type="text"
                 placeholder="GPA (optional)"
-                className="border p-2 rounded"
+                className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors"
                 value={edu.gpa}
                 onChange={(e) => updateEducation(index, 'gpa', e.target.value)}
               />
@@ -451,7 +464,7 @@ export default function ResumeForm() {
             <button
               type="button"
               onClick={() => removeEducation(index)}
-              className="mt-4 text-red-600 hover:underline text-sm"
+              className="mt-4 text-red-600 hover:text-red-700 hover:underline text-sm font-medium"
             >
               Remove Education
             </button>
@@ -460,20 +473,20 @@ export default function ResumeForm() {
         <button
           type="button"
           onClick={addEducation}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-red-600 text-white px-4 py-2.5 rounded-lg hover:bg-red-700 transition-colors font-medium text-sm"
         >
           + Add Education
         </button>
       </section>
 
       {/* Skills */}
-      <section className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-2xl font-semibold mb-4">Skills</h2>
+      <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <h2 className="text-xl font-semibold mb-4 text-gray-900">Skills</h2>
         <div className="flex gap-2 mb-4">
           <input
             type="text"
             placeholder="Add a skill"
-            className="flex-1 border p-2 rounded"
+            className="flex-1 border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors"
             value={skillInput}
             onChange={(e) => setSkillInput(e.target.value)}
             onKeyPress={(e) => {
@@ -486,7 +499,7 @@ export default function ResumeForm() {
           <button
             type="button"
             onClick={addSkill}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            className="bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 transition-colors font-medium"
           >
             Add
           </button>
@@ -495,13 +508,13 @@ export default function ResumeForm() {
           {resume.skills?.map((skill, index) => (
             <span
               key={index}
-              className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full flex items-center gap-2"
+              className="bg-red-100 text-red-800 px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm font-medium border border-red-200"
             >
               {skill}
               <button
                 type="button"
                 onClick={() => removeSkill(index)}
-                className="text-red-600 hover:text-red-800"
+                className="text-red-600 hover:text-red-800 font-bold"
               >
                 ×
               </button>
@@ -511,10 +524,10 @@ export default function ResumeForm() {
       </section>
 
       {/* Projects */}
-      <section className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-2xl font-semibold mb-4">Projects (Optional)</h2>
+      <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <h2 className="text-xl font-semibold mb-4 text-gray-900">Projects (Optional)</h2>
         {resume.projects?.map((project, index) => (
-          <div key={project.id} className="mb-6 p-4 border rounded">
+          <div key={project.id} className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
             <div className="space-y-4">
               <input
                 type="text"
@@ -554,7 +567,7 @@ export default function ResumeForm() {
             <button
               type="button"
               onClick={() => removeProject(index)}
-              className="mt-4 text-red-600 hover:underline text-sm"
+              className="mt-4 text-red-600 hover:text-red-700 hover:underline text-sm font-medium"
             >
               Remove Project
             </button>
@@ -563,50 +576,50 @@ export default function ResumeForm() {
         <button
           type="button"
           onClick={addProject}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-red-600 text-white px-4 py-2.5 rounded-lg hover:bg-red-700 transition-colors font-medium text-sm"
         >
           + Add Project
         </button>
       </section>
 
       {/* Certifications */}
-      <section className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-2xl font-semibold mb-4">Certifications (Optional)</h2>
+      <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <h2 className="text-xl font-semibold mb-4 text-gray-900">Certifications (Optional)</h2>
         {resume.certifications?.map((cert, index) => (
-          <div key={cert.id} className="mb-6 p-4 border rounded">
+          <div key={cert.id} className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <input
                 type="text"
                 placeholder="Certification Name"
-                className="border p-2 rounded"
+                className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors"
                 value={cert.name}
                 onChange={(e) => updateCertification(index, 'name', e.target.value)}
               />
               <input
                 type="text"
                 placeholder="Issuing Organization"
-                className="border p-2 rounded"
+                className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors"
                 value={cert.issuer}
                 onChange={(e) => updateCertification(index, 'issuer', e.target.value)}
               />
               <input
                 type="month"
                 placeholder="Issue Date"
-                className="border p-2 rounded"
+                className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors"
                 value={cert.date}
                 onChange={(e) => updateCertification(index, 'date', e.target.value)}
               />
               <input
                 type="month"
                 placeholder="Expiry Date (optional)"
-                className="border p-2 rounded"
+                className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors"
                 value={cert.expiryDate}
                 onChange={(e) => updateCertification(index, 'expiryDate', e.target.value)}
               />
               <input
                 type="text"
                 placeholder="Credential ID (optional)"
-                className="border p-2 rounded md:col-span-2"
+                className="border border-gray-300 p-3 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-colors md:col-span-2"
                 value={cert.credentialId}
                 onChange={(e) => updateCertification(index, 'credentialId', e.target.value)}
               />
@@ -614,7 +627,7 @@ export default function ResumeForm() {
             <button
               type="button"
               onClick={() => removeCertification(index)}
-              className="mt-4 text-red-600 hover:underline text-sm"
+              className="mt-4 text-red-600 hover:text-red-700 hover:underline text-sm font-medium"
             >
               Remove Certification
             </button>
@@ -623,22 +636,24 @@ export default function ResumeForm() {
         <button
           type="button"
           onClick={addCertification}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-red-600 text-white px-4 py-2.5 rounded-lg hover:bg-red-700 transition-colors font-medium text-sm"
         >
           + Add Certification
         </button>
       </section>
 
       {/* Submit Button */}
-      <div className="flex justify-center">
+      <div className="flex justify-center pt-4">
         <button
           type="submit"
           disabled={loading}
-          className="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 disabled:bg-gray-400 text-lg font-semibold"
+          className="bg-red-600 text-white px-10 py-4 rounded-lg hover:bg-red-700 hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed text-base font-semibold"
         >
-          {loading ? 'Saving...' : 'Create Resume'}
+          {loading ? '⏳ Creating Resume...' : '✓ Create Resume'}
         </button>
       </div>
     </form>
+      </div>
+    </div>
   );
 }

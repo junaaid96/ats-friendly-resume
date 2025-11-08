@@ -1,5 +1,7 @@
 import { Resume } from '@/types/resume';
 import Link from 'next/link';
+import ShareResume from '@/components/ShareResume';
+import PrintButton from '@/components/PrintButton';
 
 async function getResume(id: string): Promise<Resume | null> {
   try {
@@ -31,7 +33,7 @@ export default async function ResumePage({
     return (
       <div className="max-w-4xl mx-auto p-6">
         <h1 className="text-2xl font-bold text-red-600">Resume Not Found</h1>
-        <Link href="/" className="text-blue-600 hover:underline mt-4 inline-block">
+        <Link href="/" className="text-red-600 hover:text-red-700 hover:underline mt-4 inline-block font-medium">
           ← Back to Home
         </Link>
       </div>
@@ -46,25 +48,23 @@ export default async function ResumePage({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 via-rose-50 to-red-50 py-8">
       <div className="max-w-4xl mx-auto px-6">
         <div className="mb-6 flex justify-between items-center print:hidden">
-          <Link href="/" className="text-blue-600 hover:underline">
-            ← Back to Home
+          <Link href="/" className="text-red-600 hover:text-red-700 font-medium text-sm flex items-center gap-1">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Home
           </Link>
-          <button
-            onClick={() => window.print()}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Print / Save as PDF
-          </button>
+          <PrintButton />
         </div>
 
         {/* ATS-Friendly Resume Display */}
-        <div className="bg-white shadow-lg p-12 print:shadow-none" id="resume-content">
+        <div className="bg-white shadow-sm border border-gray-200 p-12 print:shadow-none rounded-xl" id="resume-content">
           {/* Header */}
-          <header className="text-center border-b-2 border-gray-300 pb-4 mb-6">
-            <h1 className="text-3xl font-bold mb-2">{resume.personalInfo.fullName}</h1>
+          <header className="text-center border-b-2 border-red-200 pb-4 mb-6">
+            <h1 className="text-3xl font-bold mb-2 text-gray-900 tracking-tight">{resume.personalInfo.fullName}</h1>
             <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-700">
               <span>{resume.personalInfo.email}</span>
               <span>•</span>
@@ -76,11 +76,11 @@ export default async function ResumePage({
               resume.personalInfo.website ||
               resume.personalInfo.github) && (
               <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-700 mt-2">
-                {resume.personalInfo.linkedin && (
+                    {resume.personalInfo.linkedin && (
                   <>
                     <a
                       href={resume.personalInfo.linkedin}
-                      className="text-blue-600 hover:underline"
+                      className="text-red-600 hover:text-red-700 hover:underline"
                     >
                       LinkedIn
                     </a>
@@ -91,7 +91,7 @@ export default async function ResumePage({
                     {resume.personalInfo.linkedin && <span>•</span>}
                     <a
                       href={resume.personalInfo.website}
-                      className="text-blue-600 hover:underline"
+                      className="text-red-600 hover:text-red-700 hover:underline"
                     >
                       Website
                     </a>
@@ -104,7 +104,7 @@ export default async function ResumePage({
                     )}
                     <a
                       href={resume.personalInfo.github}
-                      className="text-blue-600 hover:underline"
+                      className="text-red-600 hover:text-red-700 hover:underline"
                     >
                       GitHub
                     </a>
@@ -117,17 +117,17 @@ export default async function ResumePage({
           {/* Professional Summary */}
           {resume.summary && (
             <section className="mb-6">
-              <h2 className="text-xl font-bold mb-2 uppercase border-b border-gray-300 pb-1">
+              <h2 className="text-xl font-bold mb-2 uppercase border-b border-red-200 pb-1 text-gray-900 tracking-wide">
                 Professional Summary
               </h2>
-              <p className="text-gray-800 leading-relaxed">{resume.summary}</p>
+              <p className="text-gray-700 leading-relaxed font-light">{resume.summary}</p>
             </section>
           )}
 
           {/* Work Experience */}
           {resume.experience && resume.experience.length > 0 && (
             <section className="mb-6">
-              <h2 className="text-xl font-bold mb-3 uppercase border-b border-gray-300 pb-1">
+              <h2 className="text-xl font-bold mb-3 uppercase border-b border-red-200 pb-1 text-gray-900 tracking-wide">
                 Work Experience
               </h2>
               {resume.experience.map((exp) => (
@@ -160,7 +160,7 @@ export default async function ResumePage({
           {/* Education */}
           {resume.education && resume.education.length > 0 && (
             <section className="mb-6">
-              <h2 className="text-xl font-bold mb-3 uppercase border-b border-gray-300 pb-1">
+              <h2 className="text-xl font-bold mb-3 uppercase border-b border-red-200 pb-1 text-gray-900 tracking-wide">
                 Education
               </h2>
               {resume.education.map((edu) => (
@@ -188,17 +188,17 @@ export default async function ResumePage({
           {/* Skills */}
           {resume.skills && resume.skills.length > 0 && (
             <section className="mb-6">
-              <h2 className="text-xl font-bold mb-2 uppercase border-b border-gray-300 pb-1">
+              <h2 className="text-xl font-bold mb-2 uppercase border-b border-red-200 pb-1 text-gray-900 tracking-wide">
                 Skills
               </h2>
-              <p className="text-gray-800">{resume.skills.join(' • ')}</p>
+              <p className="text-gray-700 font-light">{resume.skills.join(' • ')}</p>
             </section>
           )}
 
           {/* Projects */}
           {resume.projects && resume.projects.length > 0 && (
             <section className="mb-6">
-              <h2 className="text-xl font-bold mb-3 uppercase border-b border-gray-300 pb-1">
+              <h2 className="text-xl font-bold mb-3 uppercase border-b border-red-200 pb-1 text-gray-900 tracking-wide">
                 Projects
               </h2>
               {resume.projects.map((project) => (
@@ -211,7 +211,7 @@ export default async function ResumePage({
                         -{' '}
                         <a
                           href={project.link}
-                          className="text-blue-600 hover:underline text-sm font-normal"
+                          className="text-red-600 hover:text-red-700 hover:underline text-sm font-normal"
                         >
                           {project.link}
                         </a>
@@ -233,7 +233,7 @@ export default async function ResumePage({
           {/* Certifications */}
           {resume.certifications && resume.certifications.length > 0 && (
             <section className="mb-6">
-              <h2 className="text-xl font-bold mb-3 uppercase border-b border-gray-300 pb-1">
+              <h2 className="text-xl font-bold mb-3 uppercase border-b border-red-200 pb-1 text-gray-900 tracking-wide">
                 Certifications
               </h2>
               {resume.certifications.map((cert) => (
@@ -258,26 +258,7 @@ export default async function ResumePage({
         </div>
 
         {/* Share Link */}
-        <div className="mt-6 p-4 bg-blue-50 rounded print:hidden">
-          <h3 className="font-semibold mb-2">Share this resume:</h3>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              readOnly
-              value={typeof window !== 'undefined' ? window.location.href : ''}
-              className="flex-1 border p-2 rounded bg-white"
-            />
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(window.location.href);
-                alert('Link copied to clipboard!');
-              }}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              Copy Link
-            </button>
-          </div>
-        </div>
+        <ShareResume resumeId={id} />
       </div>
     </div>
   );

@@ -8,7 +8,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const resume = getResumeById(id);
+    const resume = await getResumeById(id);
 
     if (!resume) {
       return NextResponse.json(
@@ -36,7 +36,7 @@ export async function PUT(
     const resume: Resume = await request.json();
     resume.id = id;
 
-    const savedResume = saveResume(resume);
+    const savedResume = await saveResume(resume);
     return NextResponse.json(savedResume);
   } catch (error) {
     console.error('Error updating resume:', error);
@@ -53,7 +53,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const deleted = deleteResume(id);
+    const deleted = await deleteResume(id);
 
     if (!deleted) {
       return NextResponse.json(
