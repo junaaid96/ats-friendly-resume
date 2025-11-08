@@ -115,7 +115,7 @@ export default async function ResumePage({
 
           {/* Professional Summary */}
           {resume.summary && (
-            <section className="mb-3 print:mb-2">
+            <section className="mb-4 print:mb-3">
               <h3 className="font-semibold mb-1 print:mb-0.5 uppercase text-black tracking-wide">
                 Professional Summary
               </h3>
@@ -125,7 +125,7 @@ export default async function ResumePage({
 
           {/* Work Experience */}
           {resume.experience && resume.experience.length > 0 && (
-            <section className="mb-3 print:mb-2">
+            <section className="mb-4 print:mb-3">
               <h3 className="font-semibold mb-2 print:mb-1 uppercase text-black tracking-wide">
                 Work Experience
               </h3>
@@ -158,7 +158,7 @@ export default async function ResumePage({
 
           {/* Education */}
           {resume.education && resume.education.length > 0 && (
-            <section className="mb-3 print:mb-2">
+            <section className="mb-4 print:mb-3">
               <h3 className="font-semibold mb-2 print:mb-1 uppercase text-black tracking-wide">
                 Education
               </h3>
@@ -186,7 +186,7 @@ export default async function ResumePage({
 
           {/* Skills */}
           {resume.skills && resume.skills.length > 0 && (
-            <section className="mb-3 print:mb-2">
+            <section className="mb-4 print:mb-3">
               <h3 className="font-semibold mb-1 print:mb-0.5 uppercase text-black tracking-wide">
                 Skills
               </h3>
@@ -196,7 +196,7 @@ export default async function ResumePage({
 
           {/* Projects */}
           {resume.projects && resume.projects.length > 0 && (
-            <section className="mb-3 print:mb-2">
+            <section className="mb-4 print:mb-3">
               <h3 className="font-semibold mb-2 print:mb-1 uppercase text-black tracking-wide">
                 Projects
               </h3>
@@ -231,7 +231,7 @@ export default async function ResumePage({
 
           {/* Certifications */}
           {resume.certifications && resume.certifications.length > 0 && (
-            <section className="mb-0 print:mb-0">
+            <section className="mb-4 print:mb-3">
               <h3 className="font-semibold mb-2 print:mb-1 uppercase text-black tracking-wide">
                 Certifications
               </h3>
