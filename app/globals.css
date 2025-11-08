@@ -154,21 +154,47 @@ p {
 
 /* Print Styles for Resume */
 @media print {
-    body {
-        background: white;
-        color: black;
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
     }
 
-    /* Ensure resume fits on page */
+    html, body {
+        background: white !important;
+        color: black;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Force white background on page containers in print */
+    body > div,
+    body > div > div {
+        background: white !important;
+        background-color: white !important;
+    }
+
+    /* Ensure resume fits on page with minimal margins */
     #resume-content {
         max-width: 100%;
-        padding: 0.5in;
-        margin: 0;
+        padding: 0.25in !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: white !important;
+        background-color: white !important;
     }
 
-    /* Remove page breaks inside sections */
+    /* Remove page breaks inside sections - try to keep together */
     section {
         page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    /* Prevent orphaned headings */
+    h2 {
+        page-break-after: avoid;
+        break-after: avoid;
     }
 
     /* Better link display for print */
@@ -176,9 +202,27 @@ p {
         content: none;
     }
 
-    /* Ensure proper spacing */
+    /* Ensure proper spacing with minimal margins */
     @page {
-        margin: 0.5in;
+        margin: 0.25in !important;
         size: letter;
+    }
+
+    /* Optimize font rendering for print */
+    #resume-content {
+        font-size: 10pt;
+        line-height: 1.3;
+    }
+
+    /* Prevent widows and orphans */
+    p, li {
+        orphans: 3;
+        widows: 3;
+    }
+
+    /* Compact list spacing */
+    ul, ol {
+        margin: 0;
+        padding-left: 1em;
     }
 }

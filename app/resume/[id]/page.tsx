@@ -45,9 +45,9 @@ export default async function ResumePage({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-rose-50 to-red-50 py-8">
-      <div className="max-w-4xl mx-auto px-6">
-        <div className="mb-6 flex justify-between items-center print:hidden">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 via-rose-50 to-red-50 print:bg-white py-4 print:py-0">
+      <div className="max-w-4xl mx-auto px-4 print:px-0 print:bg-white">
+        <div className="mb-4 flex justify-between items-center print:hidden">
           <Link href="/" className="text-red-600 hover:text-red-700 font-medium text-sm flex items-center gap-1">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -58,26 +58,26 @@ export default async function ResumePage({
         </div>
 
         {/* ATS-Friendly Resume Display */}
-        <div className="bg-white shadow-sm border border-gray-200 p-12 print:shadow-none rounded-xl" id="resume-content">
+        <div className="bg-white shadow-sm border border-gray-200 p-6 print:p-4 print:shadow-none print:border-0 rounded-xl print:rounded-none" id="resume-content">
           {/* Header */}
-          <header className="text-center border-b-2 border-red-200 pb-4 mb-6">
-            <h1 className="text-3xl font-bold mb-2 text-gray-900 tracking-tight">{resume.personalInfo.fullName}</h1>
-            <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-700">
+          <header className="text-center pb-2 mb-3 print:pb-1.5 print:mb-2">
+            <h1 className="text-[1.5rem] print:text-[1.5rem] font-bold mb-1 print:mb-0.5 text-black tracking-tight">{resume.personalInfo.fullName}</h1>
+            <div className="flex flex-wrap justify-center gap-x-3 gap-y-0.5 text-xs print:text-xs text-black leading-tight">
               <span>{resume.personalInfo.email}</span>
-              <span>•</span>
+              <span className="text-black">•</span>
               <span>{resume.personalInfo.phone}</span>
-              <span>•</span>
+              <span className="text-black">•</span>
               <span>{resume.personalInfo.location}</span>
             </div>
             {(resume.personalInfo.linkedin ||
               resume.personalInfo.website ||
               resume.personalInfo.github) && (
-              <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-700 mt-2">
+              <div className="flex flex-wrap justify-center gap-x-3 gap-y-0.5 text-xs print:text-xs text-black mt-1 print:mt-0.5 leading-tight">
                     {resume.personalInfo.linkedin && (
                   <>
                     <a
                       href={resume.personalInfo.linkedin}
-                      className="text-red-600 hover:text-red-700 hover:underline"
+                      className="text-black hover:underline print:text-black"
                     >
                       LinkedIn
                     </a>
@@ -85,10 +85,10 @@ export default async function ResumePage({
                 )}
                 {resume.personalInfo.website && (
                   <>
-                    {resume.personalInfo.linkedin && <span>•</span>}
+                    {resume.personalInfo.linkedin && <span className="text-black">•</span>}
                     <a
                       href={resume.personalInfo.website}
-                      className="text-red-600 hover:text-red-700 hover:underline"
+                      className="text-black hover:underline print:text-black"
                     >
                       Website
                     </a>
@@ -97,11 +97,11 @@ export default async function ResumePage({
                 {resume.personalInfo.github && (
                   <>
                     {(resume.personalInfo.linkedin || resume.personalInfo.website) && (
-                      <span>•</span>
+                      <span className="text-black">•</span>
                     )}
                     <a
                       href={resume.personalInfo.github}
-                      className="text-red-600 hover:text-red-700 hover:underline"
+                      className="text-black hover:underline print:text-black"
                     >
                       GitHub
                     </a>
@@ -109,44 +109,46 @@ export default async function ResumePage({
                 )}
               </div>
             )}
+            {/* Subtle horizontal line separator */}
+            <div className="border-b border-gray-300 mt-3 print:mt-2"></div>
           </header>
 
           {/* Professional Summary */}
           {resume.summary && (
-            <section className="mb-6">
-              <h2 className="text-xl font-bold mb-2 uppercase border-b border-red-200 pb-1 text-gray-900 tracking-wide">
+            <section className="mb-3 print:mb-2">
+              <h3 className="font-semibold mb-1 print:mb-0.5 uppercase text-black tracking-wide">
                 Professional Summary
-              </h2>
-              <p className="text-gray-700 leading-relaxed font-light">{resume.summary}</p>
+              </h3>
+              <p className="text-xs print:text-xs text-black leading-relaxed print:leading-snug font-light mt-1 print:mt-0.5">{resume.summary}</p>
             </section>
           )}
 
           {/* Work Experience */}
           {resume.experience && resume.experience.length > 0 && (
-            <section className="mb-6">
-              <h2 className="text-xl font-bold mb-3 uppercase border-b border-red-200 pb-1 text-gray-900 tracking-wide">
+            <section className="mb-3 print:mb-2">
+              <h3 className="font-semibold mb-2 print:mb-1 uppercase text-black tracking-wide">
                 Work Experience
-              </h2>
-              {resume.experience.map((exp) => (
-                <div key={exp.id} className="mb-4">
-                  <div className="flex justify-between items-start mb-1">
-                    <div>
-                      <h3 className="font-bold text-lg">{exp.position}</h3>
-                      <p className="text-gray-700 font-medium">{exp.company}</p>
+              </h3>
+              {resume.experience.map((exp, idx) => (
+                <div key={exp.id} className={idx < resume.experience.length - 1 ? "mb-2.5 print:mb-2" : "mb-0"}>
+                  <div className="flex justify-between items-start mb-0.5 print:mb-0 gap-2">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-sm print:text-xs text-black leading-tight">{exp.position}</h3>
+                      <p className="text-xs print:text-xs text-black font-medium leading-tight">{exp.company}</p>
                     </div>
-                    <div className="text-right text-sm text-gray-600">
-                      <p>{exp.location}</p>
-                      <p>
+                    <div className="text-right text-xs print:text-xs text-black leading-tight flex-shrink-0">
+                      <p className="whitespace-nowrap">{exp.location}</p>
+                      <p className="whitespace-nowrap">
                         {formatDate(exp.startDate)} -{' '}
                         {exp.current ? 'Present' : formatDate(exp.endDate)}
                       </p>
                     </div>
                   </div>
-                  <ul className="list-disc list-inside space-y-1 text-gray-800 ml-2">
+                  <ul className="list-disc list-inside space-y-0.5 print:space-y-0 text-xs print:text-xs text-black ml-1 print:ml-0.5 leading-relaxed print:leading-snug">
                     {exp.responsibilities
                       .filter((r) => r.trim())
                       .map((resp, idx) => (
-                        <li key={idx}>{resp}</li>
+                        <li key={idx} className="leading-relaxed print:leading-snug">{resp}</li>
                       ))}
                   </ul>
                 </div>
@@ -156,23 +158,23 @@ export default async function ResumePage({
 
           {/* Education */}
           {resume.education && resume.education.length > 0 && (
-            <section className="mb-6">
-              <h2 className="text-xl font-bold mb-3 uppercase border-b border-red-200 pb-1 text-gray-900 tracking-wide">
+            <section className="mb-3 print:mb-2">
+              <h3 className="font-semibold mb-2 print:mb-1 uppercase text-black tracking-wide">
                 Education
-              </h2>
-              {resume.education.map((edu) => (
-                <div key={edu.id} className="mb-3">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-bold">
+              </h3>
+              {resume.education.map((edu, idx) => (
+                <div key={edu.id} className={idx < resume.education.length - 1 ? "mb-2 print:mb-1.5" : "mb-0"}>
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-sm print:text-xs text-black leading-tight">
                         {edu.degree} in {edu.field}
                       </h3>
-                      <p className="text-gray-700">{edu.institution}</p>
-                      {edu.gpa && <p className="text-sm text-gray-600">GPA: {edu.gpa}</p>}
+                      <p className="text-xs print:text-xs text-black leading-tight">{edu.institution}</p>
+                      {edu.gpa && <p className="text-xs print:text-xs text-black leading-tight">GPA: {edu.gpa}</p>}
                     </div>
-                    <div className="text-right text-sm text-gray-600">
-                      <p>{edu.location}</p>
-                      <p>
+                    <div className="text-right text-xs print:text-xs text-black leading-tight flex-shrink-0">
+                      <p className="whitespace-nowrap">{edu.location}</p>
+                      <p className="whitespace-nowrap">
                         {formatDate(edu.startDate)} - {formatDate(edu.endDate)}
                       </p>
                     </div>
@@ -184,40 +186,40 @@ export default async function ResumePage({
 
           {/* Skills */}
           {resume.skills && resume.skills.length > 0 && (
-            <section className="mb-6">
-              <h2 className="text-xl font-bold mb-2 uppercase border-b border-red-200 pb-1 text-gray-900 tracking-wide">
+            <section className="mb-3 print:mb-2">
+              <h3 className="font-semibold mb-1 print:mb-0.5 uppercase text-black tracking-wide">
                 Skills
-              </h2>
-              <p className="text-gray-700 font-light">{resume.skills.join(' • ')}</p>
+              </h3>
+              <p className="text-xs print:text-xs text-black font-light leading-relaxed print:leading-snug mt-1 print:mt-0.5">{resume.skills.join(' • ')}</p>
             </section>
           )}
 
           {/* Projects */}
           {resume.projects && resume.projects.length > 0 && (
-            <section className="mb-6">
-              <h2 className="text-xl font-bold mb-3 uppercase border-b border-red-200 pb-1 text-gray-900 tracking-wide">
+            <section className="mb-3 print:mb-2">
+              <h3 className="font-semibold mb-2 print:mb-1 uppercase text-black tracking-wide">
                 Projects
-              </h2>
-              {resume.projects.map((project) => (
-                <div key={project.id} className="mb-3">
-                  <h3 className="font-bold">
+              </h3>
+              {resume.projects.map((project, idx) => (
+                <div key={project.id} className={idx < resume.projects.length - 1 ? "mb-2 print:mb-1.5" : "mb-0"}>
+                  <h3 className="font-bold text-sm print:text-xs text-black leading-tight">
                     {project.name}
                     {project.link && (
                       <>
                         {' '}
-                        -{' '}
+                        <span className="text-black">-</span>{' '}
                         <a
                           href={project.link}
-                          className="text-red-600 hover:text-red-700 hover:underline text-sm font-normal"
+                          className="text-black hover:underline text-xs print:text-xs font-normal break-all"
                         >
                           {project.link}
                         </a>
                       </>
                     )}
                   </h3>
-                  <p className="text-gray-800 mb-1">{project.description}</p>
+                  <p className="text-xs print:text-xs text-black mb-0.5 print:mb-0 leading-relaxed print:leading-snug mt-0.5 print:mt-0">{project.description}</p>
                   {project.technologies.length > 0 && (
-                    <p className="text-sm text-gray-600">
+                    <p className="text-xs print:text-xs text-black leading-tight">
                       <span className="font-medium">Technologies:</span>{' '}
                       {project.technologies.join(', ')}
                     </p>
@@ -229,23 +231,23 @@ export default async function ResumePage({
 
           {/* Certifications */}
           {resume.certifications && resume.certifications.length > 0 && (
-            <section className="mb-6">
-              <h2 className="text-xl font-bold mb-3 uppercase border-b border-red-200 pb-1 text-gray-900 tracking-wide">
+            <section className="mb-0 print:mb-0">
+              <h3 className="font-semibold mb-2 print:mb-1 uppercase text-black tracking-wide">
                 Certifications
-              </h2>
-              {resume.certifications.map((cert) => (
-                <div key={cert.id} className="mb-2">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-bold">{cert.name}</h3>
-                      <p className="text-gray-700">{cert.issuer}</p>
+              </h3>
+              {resume.certifications.map((cert, idx) => (
+                <div key={cert.id} className={idx < resume.certifications.length - 1 ? "mb-1.5 print:mb-1" : "mb-0"}>
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-sm print:text-xs text-black leading-tight">{cert.name}</h3>
+                      <p className="text-xs print:text-xs text-black leading-tight">{cert.issuer}</p>
                       {cert.credentialId && (
-                        <p className="text-sm text-gray-600">ID: {cert.credentialId}</p>
+                        <p className="text-xs print:text-xs text-black leading-tight">ID: {cert.credentialId}</p>
                       )}
                     </div>
-                    <div className="text-right text-sm text-gray-600">
-                      <p>Issued: {formatDate(cert.date)}</p>
-                      {cert.expiryDate && <p>Expires: {formatDate(cert.expiryDate)}</p>}
+                    <div className="text-right text-xs print:text-xs text-black leading-tight flex-shrink-0">
+                      <p className="whitespace-nowrap">Issued: {formatDate(cert.date)}</p>
+                      {cert.expiryDate && <p className="whitespace-nowrap">Expires: {formatDate(cert.expiryDate)}</p>}
                     </div>
                   </div>
                 </div>
