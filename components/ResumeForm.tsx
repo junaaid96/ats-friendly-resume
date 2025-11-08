@@ -3,6 +3,11 @@
 import { useState } from 'react';
 import { Resume, WorkExperience, Education, Project, Certification } from '@/types/resume';
 import { useRouter } from 'next/navigation';
+<<<<<<< Updated upstream
+=======
+import Link from 'next/link';
+import { showToast } from '@/components/Toast';
+>>>>>>> Stashed changes
 
 export default function ResumeForm() {
   const router = useRouter();
@@ -177,13 +182,14 @@ export default function ResumeForm() {
 
       if (response.ok) {
         const savedResume = await response.json();
+        showToast('Resume created successfully!', 'success');
         router.push(`/resume/${savedResume.id}`);
       } else {
-        alert('Failed to save resume');
+        showToast('Failed to save resume. Please try again.', 'error');
       }
     } catch (error) {
       console.error('Error saving resume:', error);
-      alert('Error saving resume');
+      showToast('Error saving resume. Please try again.', 'error');
     } finally {
       setLoading(false);
     }

@@ -3,8 +3,9 @@ import { sql } from '@vercel/postgres';
 import fs from 'fs';
 import path from 'path';
 
-// Check if we're using Postgres (Vercel production) or file system (local dev)
-const USE_POSTGRES = !!process.env.POSTGRES_URL;
+// Check if we're using Postgres (production) or file system (local dev)
+// Supports Vercel Postgres, Neon, Supabase, or any PostgreSQL database
+const USE_POSTGRES = !!(process.env.POSTGRES_URL || process.env.DATABASE_URL);
 
 // File system fallback for local development
 const DATA_DIR = path.join(process.cwd(), 'data');

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { showToast } from '@/components/Toast';
 
 interface ShareResumeProps {
   resumeId: string;
@@ -20,7 +21,7 @@ export default function ShareResume({ resumeId }: ShareResumeProps) {
     try {
       if (typeof window !== 'undefined' && navigator.clipboard) {
         await navigator.clipboard.writeText(window.location.href);
-        alert('Link copied to clipboard!');
+        showToast('Link copied to clipboard!', 'success');
       }
     } catch (error) {
       console.error('Failed to copy link:', error);
@@ -31,9 +32,10 @@ export default function ShareResume({ resumeId }: ShareResumeProps) {
       textArea.select();
       try {
         document.execCommand('copy');
-        alert('Link copied to clipboard!');
+        showToast('Link copied to clipboard!', 'success');
       } catch (err) {
         console.error('Fallback copy failed:', err);
+        showToast('Failed to copy link. Please try again.', 'error');
       }
       document.body.removeChild(textArea);
     }
