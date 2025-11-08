@@ -133,7 +133,7 @@ export default async function ResumePage({
                 <div key={exp.id} className={idx < resume.experience.length - 1 ? "mb-2.5 print:mb-2" : "mb-0"}>
                   <div className="flex justify-between items-start mb-0.5 print:mb-0 gap-2">
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-sm print:text-xs text-black leading-tight">{exp.position}</h3>
+                      <h4 className="font-bold text-sm print:text-xs text-black leading-tight">{exp.position}</h4>
                       <p className="text-xs print:text-xs text-black font-medium leading-tight">{exp.company}</p>
                     </div>
                     <div className="text-right text-xs print:text-xs text-black leading-tight flex-shrink-0">
@@ -166,9 +166,9 @@ export default async function ResumePage({
                 <div key={edu.id} className={idx < resume.education.length - 1 ? "mb-2 print:mb-1.5" : "mb-0"}>
                   <div className="flex justify-between items-start gap-2">
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-sm print:text-xs text-black leading-tight">
+                      <h4 className="font-bold text-sm print:text-xs text-black leading-tight">
                         {edu.degree} in {edu.field}
-                      </h3>
+                      </h4>
                       <p className="text-xs print:text-xs text-black leading-tight">{edu.institution}</p>
                       {edu.gpa && <p className="text-xs print:text-xs text-black leading-tight">GPA: {edu.gpa}</p>}
                     </div>
@@ -202,8 +202,8 @@ export default async function ResumePage({
               </h3>
               {resume.projects.map((project, idx) => (
                 <div key={project.id} className={idx < (resume.projects?.length ?? 0) - 1 ? "mb-2 print:mb-1.5" : "mb-0"}>
-                  <h3 className="font-bold text-sm print:text-xs text-black leading-tight">
-                    {project.name}
+                  <h4 className="font-bold text-sm print:text-xs text-black leading-tight">
+                        {project.name}
                     {project.link && (
                       <>
                         {' '}
@@ -216,7 +216,7 @@ export default async function ResumePage({
                         </a>
                       </>
                     )}
-                  </h3>
+                  </h4>
                   <p className="text-xs print:text-xs text-black mb-0.5 print:mb-0 leading-relaxed print:leading-snug mt-0.5 print:mt-0">{project.description}</p>
                   {project.technologies.length > 0 && (
                     <p className="text-xs print:text-xs text-black leading-tight">
@@ -239,7 +239,7 @@ export default async function ResumePage({
                 <div key={cert.id} className={idx < (resume.certifications?.length ?? 0) - 1 ? "mb-1.5 print:mb-1" : "mb-0"}>
                   <div className="flex justify-between items-start gap-2">
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-sm print:text-xs text-black leading-tight">{cert.name}</h3>
+                      <h4 className="font-bold text-sm print:text-xs text-black leading-tight">{cert.name}</h4>
                       <p className="text-xs print:text-xs text-black leading-tight">{cert.issuer}</p>
                       {cert.credentialId && (
                         <p className="text-xs print:text-xs text-black leading-tight">ID: {cert.credentialId}</p>
