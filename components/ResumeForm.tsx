@@ -198,6 +198,27 @@ export default function ResumeForm() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 via-rose-50 to-red-50 py-12 px-6">
       <div className="max-w-5xl mx-auto">
+        {/* Back Button */}
+        <Link 
+          href="/" 
+          className="inline-flex items-center gap-2 text-red-600 hover:text-red-700 font-medium text-sm mb-6 transition-colors"
+        >
+          <svg 
+            className="w-5 h-5" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M15 19l-7-7 7-7" 
+            />
+          </svg>
+          Back to Home
+        </Link>
+
         <div className="text-center mb-10">
           <div className="inline-block mb-4">
             <span className="bg-red-100 text-red-700 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase">
