@@ -4,7 +4,7 @@ import { Resume } from '@/types/resume';
 
 export async function GET() {
   try {
-    const resumes = getAllResumes();
+    const resumes = await getAllResumes();
     return NextResponse.json(resumes);
   } catch (error) {
     console.error('Error fetching resumes:', error);
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
       resume.id = `resume-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     }
 
-    const savedResume = saveResume(resume);
+    const savedResume = await saveResume(resume);
     return NextResponse.json(savedResume, { status: 201 });
   } catch (error) {
     console.error('Error creating resume:', error);
