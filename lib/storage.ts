@@ -45,6 +45,7 @@ function rowToResume(row: any): Resume {
       skills: parseJsonb(row.skills) || [],
       projects: parseJsonb(row.projects) || [],
       certifications: parseJsonb(row.certifications) || [],
+      template: row.template || 'classic-red',
       createdAt: row.created_at || new Date().toISOString(),
       updatedAt: row.updated_at || new Date().toISOString(),
     };
@@ -129,6 +130,7 @@ export async function saveResume(resume: Resume): Promise<Resume> {
             skills = ${JSON.stringify(resume.skills)}::jsonb,
             projects = ${JSON.stringify(resume.projects || [])}::jsonb,
             certifications = ${JSON.stringify(resume.certifications || [])}::jsonb,
+            template = ${resume.template || 'classic-red'},
             updated_at = ${now}
           WHERE id = ${resume.id}
         `;
@@ -136,8 +138,8 @@ export async function saveResume(resume: Resume): Promise<Resume> {
         // Insert new resume
         await sql`
           INSERT INTO resumes (
-            id, personal_info, summary, experience, education, 
-            skills, projects, certifications, created_at, updated_at
+            id, personal_info, summary, experience, education,
+            skills, projects, certifications, template, created_at, updated_at
           )
           VALUES (
             ${resume.id},
@@ -148,6 +150,7 @@ export async function saveResume(resume: Resume): Promise<Resume> {
             ${JSON.stringify(resume.skills)}::jsonb,
             ${JSON.stringify(resume.projects || [])}::jsonb,
             ${JSON.stringify(resume.certifications || [])}::jsonb,
+            ${resume.template || 'classic-red'},
             ${resume.createdAt || now},
             ${now}
           )

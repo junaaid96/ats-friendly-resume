@@ -5,6 +5,7 @@ import { Resume, WorkExperience, Education, Project, Certification } from '@/typ
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { showToast } from '@/components/Toast';
+import TemplateSelector from '@/components/TemplateSelector';
 import {
   ValidationErrors,
   validateEmail,
@@ -42,6 +43,7 @@ export default function ResumeForm() {
     skills: [],
     projects: [],
     certifications: [],
+    template: 'classic-red',
   });
 
   const [skillInput, setSkillInput] = useState('');
@@ -632,6 +634,16 @@ export default function ResumeForm() {
         </div>
 
     <form onSubmit={handleSubmit} className="space-y-6">
+
+      {/* Template Selection */}
+      <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <TemplateSelector
+          selectedTemplate={resume.template}
+          onSelectTemplate={(templateId) => {
+            setResume({ ...resume, template: templateId });
+          }}
+        />
+      </section>
 
       {/* Personal Information */}
       <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">

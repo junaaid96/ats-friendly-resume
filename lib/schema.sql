@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS resumes (
   skills JSONB NOT NULL DEFAULT '[]'::jsonb,
   projects JSONB DEFAULT '[]'::jsonb,
   certifications JSONB DEFAULT '[]'::jsonb,
+  template VARCHAR(50) DEFAULT 'classic-red',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

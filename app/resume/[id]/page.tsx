@@ -3,6 +3,7 @@ import Link from 'next/link';
 import ShareResume from '@/components/ShareResume';
 import PrintButton from '@/components/PrintButton';
 import { getResumeById } from '@/lib/storage';
+import { getTemplate, getTemplateStyles } from '@/lib/templates';
 
 // Force dynamic rendering to prevent caching stale data
 export const dynamic = 'force-dynamic';
@@ -44,11 +45,14 @@ export default async function ResumePage({
     return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   };
 
+  const template = getTemplate(resume.template);
+  const templateStyles = getTemplateStyles(template);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-rose-50 to-red-50 print:bg-white py-4 print:py-0">
+    <div className="min-h-screen print:bg-white py-4 print:py-0" style={{ backgroundColor: template.colors.accent }}>
       <div className="max-w-4xl mx-auto px-4 print:px-0 print:bg-white">
         <div className="mb-4 flex justify-between items-center print:hidden">
-          <Link href="/" className="text-red-600 hover:text-red-700 font-medium text-sm flex items-center gap-1">
+          <Link href="/" className="font-medium text-sm flex items-center gap-1 hover:underline" style={{ color: template.colors.primary }}>
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
@@ -60,8 +64,8 @@ export default async function ResumePage({
         {/* ATS-Friendly Resume Display */}
         <div className="bg-white shadow-sm border border-gray-200 p-6 print:p-4 print:shadow-none print:border-0 rounded-xl print:rounded-none" id="resume-content">
           {/* Header */}
-          <header className="text-center pb-2 mb-3 print:pb-1.5 print:mb-2">
-            <h1 className="text-[1.5rem] print:text-[1.5rem] font-bold mb-1 print:mb-0.5 text-black tracking-tight">{resume.personalInfo.fullName}</h1>
+          <header className={`pb-2 mb-3 print:pb-1.5 print:mb-2 ${template.styles.headerAlign === 'center' ? 'text-center' : template.styles.headerAlign === 'right' ? 'text-right' : 'text-left'}`}>
+            <h1 className="text-[1.5rem] print:text-[1.5rem] font-bold mb-1 print:mb-0.5 print:text-black tracking-tight" style={{ color: template.colors.primary }}>{resume.personalInfo.fullName}</h1>
             <div className="flex flex-wrap justify-center gap-x-3 gap-y-0.5 text-xs print:text-xs text-black leading-tight">
               <span>{resume.personalInfo.email}</span>
               <span className="text-black">•</span>
@@ -110,13 +114,13 @@ export default async function ResumePage({
               </div>
             )}
             {/* Subtle horizontal line separator */}
-            <div className="border-b border-gray-300 mt-3 print:mt-2"></div>
+            <div className="mt-3 print:mt-2" style={{ borderBottom: template.styles.sectionDivider !== 'space' ? `${template.styles.sectionDivider === 'border' ? '2px' : '1px'} solid ${template.colors.primary}` : 'none' }}></div>
           </header>
 
           {/* Professional Summary */}
           {resume.summary && (
             <section className="mb-4 print:mb-3">
-              <h3 className="font-semibold mb-1 print:mb-0.5 uppercase text-black tracking-wide">
+              <h3 className="font-semibold mb-1 print:mb-0.5 uppercase print:text-black tracking-wide" style={{ color: template.colors.primary }}>
                 Professional Summary
               </h3>
               <p className="text-xs print:text-xs text-black leading-relaxed print:leading-snug font-light mt-1 print:mt-0.5">{resume.summary}</p>
@@ -126,7 +130,7 @@ export default async function ResumePage({
           {/* Work Experience */}
           {resume.experience && resume.experience.length > 0 && (
             <section className="mb-4 print:mb-3">
-              <h3 className="font-semibold mb-2 print:mb-1 uppercase text-black tracking-wide">
+              <h3 className="font-semibold mb-2 print:mb-1 uppercase print:text-black tracking-wide" style={{ color: template.colors.primary }}>
                 Work Experience
               </h3>
               {resume.experience.map((exp, idx) => (
@@ -159,7 +163,7 @@ export default async function ResumePage({
           {/* Education */}
           {resume.education && resume.education.length > 0 && (
             <section className="mb-4 print:mb-3">
-              <h3 className="font-semibold mb-2 print:mb-1 uppercase text-black tracking-wide">
+              <h3 className="font-semibold mb-2 print:mb-1 uppercase print:text-black tracking-wide" style={{ color: template.colors.primary }}>
                 Education
               </h3>
               {resume.education.map((edu, idx) => (
@@ -187,7 +191,7 @@ export default async function ResumePage({
           {/* Skills */}
           {resume.skills && resume.skills.length > 0 && (
             <section className="mb-4 print:mb-3">
-              <h3 className="font-semibold mb-1 print:mb-0.5 uppercase text-black tracking-wide">
+              <h3 className="font-semibold mb-1 print:mb-0.5 uppercase print:text-black tracking-wide" style={{ color: template.colors.primary }}>
                 Skills
               </h3>
               <p className="text-xs print:text-xs text-black font-light leading-relaxed print:leading-snug mt-1 print:mt-0.5">{resume.skills.join(' • ')}</p>
@@ -197,7 +201,7 @@ export default async function ResumePage({
           {/* Projects */}
           {resume.projects && resume.projects.length > 0 && (
             <section className="mb-4 print:mb-3">
-              <h3 className="font-semibold mb-2 print:mb-1 uppercase text-black tracking-wide">
+              <h3 className="font-semibold mb-2 print:mb-1 uppercase print:text-black tracking-wide" style={{ color: template.colors.primary }}>
                 Projects
               </h3>
               {resume.projects.map((project, idx) => (
@@ -232,7 +236,7 @@ export default async function ResumePage({
           {/* Certifications */}
           {resume.certifications && resume.certifications.length > 0 && (
             <section className="mb-4 print:mb-3">
-              <h3 className="font-semibold mb-2 print:mb-1 uppercase text-black tracking-wide">
+              <h3 className="font-semibold mb-2 print:mb-1 uppercase print:text-black tracking-wide" style={{ color: template.colors.primary }}>
                 Certifications
               </h3>
               {resume.certifications.map((cert, idx) => (
