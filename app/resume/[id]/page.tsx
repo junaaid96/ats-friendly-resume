@@ -2,6 +2,7 @@ import { Resume } from '@/types/resume';
 import Link from 'next/link';
 import ShareResume from '@/components/ShareResume';
 import PrintButton from '@/components/PrintButton';
+import ATSAnalyzer from '@/components/ATSAnalyzer';
 import { getResumeById } from '@/lib/storage';
 import { getTemplate, getTemplateStyles } from '@/lib/templates';
 
@@ -259,6 +260,9 @@ export default async function ResumePage({
             </section>
           )}
         </div>
+
+        {/* ATS Analyzer */}
+        <ATSAnalyzer resume={resume} />
 
         {/* Share Link */}
         <ShareResume resumeId={id} />

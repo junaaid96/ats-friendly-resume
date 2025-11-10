@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { showToast } from '@/components/Toast';
 import TemplateSelector from '@/components/TemplateSelector';
+import AIAssistant from '@/components/AIAssistant';
 import {
   ValidationErrors,
   validateEmail,
@@ -531,6 +532,18 @@ export default function ResumeForm() {
     setResume({ ...resume, certifications: updated });
   };
 
+  const handleAISuggestion = (field: string, value: any) => {
+    if (field === 'summary') {
+      setResume({ ...resume, summary: value });
+    } else if (field === 'template') {
+      setResume({ ...resume, template: value });
+    } else if (field === 'addSkill') {
+      if (!resume.skills?.includes(value)) {
+        setResume({ ...resume, skills: [...(resume.skills || []), value] });
+      }
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -642,6 +655,14 @@ export default function ResumeForm() {
           onSelectTemplate={(templateId) => {
             setResume({ ...resume, template: templateId });
           }}
+        />
+      </section>
+
+      {/* AI Assistant */}
+      <section>
+        <AIAssistant
+          resume={resume}
+          onApplySuggestion={handleAISuggestion}
         />
       </section>
 
