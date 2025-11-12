@@ -200,6 +200,7 @@ export default function AIAssistant({ resume, onApplySuggestion }: AIAssistantPr
         ].map((tab) => (
           <button
             key={tab.id}
+            type="button"
             onClick={() => setActiveTab(tab.id as any)}
             className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
               activeTab === tab.id
@@ -239,6 +240,7 @@ export default function AIAssistant({ resume, onApplySuggestion }: AIAssistantPr
                   onChange={(e) => setYearsExp(e.target.value)}
                 />
                 <button
+                  type="button"
                   onClick={generateSummaries}
                   disabled={loading}
                   className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-3 rounded-lg hover:shadow-lg transition-all disabled:opacity-50 font-medium"
@@ -254,6 +256,7 @@ export default function AIAssistant({ resume, onApplySuggestion }: AIAssistantPr
                     <div key={idx} className="p-3 bg-purple-50 border border-purple-200 rounded-lg">
                       <p className="text-sm text-gray-800 mb-2">{summary}</p>
                       <button
+                        type="button"
                         onClick={() => onApplySuggestion?.('summary', summary)}
                         className="text-purple-600 hover:text-purple-700 text-sm font-medium"
                       >
@@ -291,6 +294,7 @@ export default function AIAssistant({ resume, onApplySuggestion }: AIAssistantPr
                   onChange={(e) => setBulletPoint(e.target.value)}
                 />
                 <button
+                  type="button"
                   onClick={improveBullet}
                   disabled={loading}
                   className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-3 rounded-lg hover:shadow-lg transition-all disabled:opacity-50 font-medium"
@@ -330,6 +334,7 @@ export default function AIAssistant({ resume, onApplySuggestion }: AIAssistantPr
                   onChange={(e) => setJobTitle(e.target.value)}
                 />
                 <button
+                  type="button"
                   onClick={suggestSkills}
                   disabled={loading}
                   className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-3 rounded-lg hover:shadow-lg transition-all disabled:opacity-50 font-medium"
@@ -345,6 +350,7 @@ export default function AIAssistant({ resume, onApplySuggestion }: AIAssistantPr
                     {skillSuggestions.map((skill, idx) => (
                       <button
                         key={idx}
+                        type="button"
                         onClick={() => {
                           if (!resume.skills?.includes(skill)) {
                             onApplySuggestion?.('addSkill', skill);
@@ -372,6 +378,7 @@ export default function AIAssistant({ resume, onApplySuggestion }: AIAssistantPr
                 Check how well your resume will perform with Applicant Tracking Systems.
               </p>
               <button
+                type="button"
                 onClick={analyzeATS}
                 disabled={loading}
                 className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-3 rounded-lg hover:shadow-lg transition-all disabled:opacity-50 font-medium"
@@ -436,6 +443,7 @@ export default function AIAssistant({ resume, onApplySuggestion }: AIAssistantPr
                 AI will analyze your resume and recommend the best template design.
               </p>
               <button
+                type="button"
                 onClick={recommendTemplate}
                 disabled={loading}
                 className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-3 rounded-lg hover:shadow-lg transition-all disabled:opacity-50 font-medium"
@@ -452,6 +460,7 @@ export default function AIAssistant({ resume, onApplySuggestion }: AIAssistantPr
                     </div>
                     <p className="text-sm text-gray-700">{templateRec.reason}</p>
                     <button
+                      type="button"
                       onClick={() => onApplySuggestion?.('template', templateRec.templateId)}
                       className="text-purple-600 hover:text-purple-700 text-sm font-medium"
                     >
