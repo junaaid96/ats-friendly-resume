@@ -571,7 +571,7 @@ export default function ResumeForm() {
 
     // Validate form
     if (!validateForm()) {
-      showToast('Please fix the validation errors before submitting.', 'error');
+      showToast('Please fill in the required field before submitting.', 'error');
       // Scroll to first error after a brief delay to allow state update
       setTimeout(() => {
         const firstErrorElement = document.querySelector('.border-red-500');
