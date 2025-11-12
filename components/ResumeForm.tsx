@@ -5,6 +5,8 @@ import { Resume, WorkExperience, Education, Project, Certification } from '@/typ
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { showToast } from '@/components/Toast';
+import TemplateSelector from '@/components/TemplateSelector';
+import AIAssistant from '@/components/AIAssistant';
 import {
   ValidationErrors,
   validateEmail,
@@ -42,6 +44,7 @@ export default function ResumeForm() {
     skills: [],
     projects: [],
     certifications: [],
+    template: 'classic-red',
   });
 
   const [skillInput, setSkillInput] = useState('');
@@ -529,6 +532,18 @@ export default function ResumeForm() {
     setResume({ ...resume, certifications: updated });
   };
 
+  const handleAISuggestion = (field: string, value: any) => {
+    if (field === 'summary') {
+      setResume({ ...resume, summary: value });
+    } else if (field === 'template') {
+      setResume({ ...resume, template: value });
+    } else if (field === 'addSkill') {
+      if (!resume.skills?.includes(value)) {
+        setResume({ ...resume, skills: [...(resume.skills || []), value] });
+      }
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -632,6 +647,24 @@ export default function ResumeForm() {
         </div>
 
     <form onSubmit={handleSubmit} className="space-y-6">
+
+      {/* Template Selection */}
+      <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <TemplateSelector
+          selectedTemplate={resume.template}
+          onSelectTemplate={(templateId) => {
+            setResume({ ...resume, template: templateId });
+          }}
+        />
+      </section>
+
+      {/* AI Assistant */}
+      <section>
+        <AIAssistant
+          resume={resume}
+          onApplySuggestion={handleAISuggestion}
+        />
+      </section>
 
       {/* Personal Information */}
       <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">

@@ -7,6 +7,7 @@ export interface Resume {
   skills: string[];
   projects?: Project[];
   certifications?: Certification[];
+  template?: string;
   createdAt: string;
   updatedAt: string;
 }
