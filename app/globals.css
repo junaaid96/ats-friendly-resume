@@ -1,243 +1,184 @@
 @import "tailwindcss";
 
-:root {
-    --background: #fefefe;
-    --foreground: #1a1a1a;
-    --primary: #dc2626;
-    --primary-dark: #b91c1c;
-    --primary-light: #ef4444;
-    --secondary: #991b1b;
-    --accent: #f87171;
-    --red-50: #fef2f2;
-    --red-100: #fee2e2;
-    --red-200: #fecaca;
-    --red-300: #fca5a5;
-    --red-400: #f87171;
-    --red-500: #ef4444;
-    --red-600: #dc2626;
-    --red-700: #b91c1c;
-    --red-800: #991b1b;
-    --red-900: #7f1d1d;
-    --gray-50: #fafafa;
-    --gray-100: #f5f5f5;
-    --gray-200: #e5e5e5;
-    --gray-300: #d4d4d4;
-    --gray-400: #a3a3a3;
-    --gray-500: #737373;
-    --gray-600: #525252;
-    --gray-700: #404040;
-    --gray-800: #262626;
-    --gray-900: #171717;
-}
+/*
+ * Arvix design tokens. Warm paper surfaces, ink text and a single crimson
+ * accent. Everything else in the UI is built from these.
+ */
+@theme {
+    --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
 
-@theme inline {
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-    --font-sans: var(--font-inter);
-}
+    --color-paper: #faf8f5;
+    --color-paper-2: #f3efe9;
+    --color-surface: #ffffff;
+    --color-ink: #1c1917;
+    --color-ink-2: #44403c;
+    --color-muted: #78716c;
+    --color-line: #e7e2da;
+    --color-line-strong: #d6cfc4;
 
-body {
-    background: var(--background);
-    color: var(--foreground);
-    font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
-    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-}
+    --color-brand: #b4232c;
+    --color-brand-hover: #9a1c24;
+    --color-brand-soft: #fbeceb;
+    --color-brand-ink: #7a151b;
 
-/* Smooth scrolling */
-html {
-    scroll-behavior: smooth;
-}
+    --color-ok: #15803d;
+    --color-ok-soft: #e9f6ee;
+    --color-warn: #b45309;
+    --color-warn-soft: #fdf3e2;
 
-/* Custom animations */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
+    --shadow-card: 0 1px 2px rgb(28 25 23 / 0.04), 0 4px 16px -8px rgb(28 25 23 / 0.08);
+    --shadow-paper: 0 1px 3px rgb(28 25 23 / 0.06), 0 24px 48px -24px rgb(28 25 23 / 0.25);
+    --shadow-pop: 0 12px 32px -12px rgb(28 25 23 / 0.28);
+
+    --animate-rise: rise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    --animate-toast: toast-in 0.25s ease-out both;
+
+    @keyframes rise {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    @keyframes toast-in {
+        from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
     }
 }
 
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
+/*
+ * Base styles live in a layer so Tailwind utilities always win. (Unlayered
+ * element rules here used to override classes like text-xs on headings.)
+ */
+@layer base {
+    html {
+        scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
     }
-    to {
-        opacity: 1;
-        transform: translateX(0);
+
+    body {
+        background: var(--color-paper);
+        color: var(--color-ink);
+        font-family: var(--font-sans);
+        font-feature-settings: "cv11", "ss01";
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+
+    ::selection {
+        background: color-mix(in srgb, var(--color-brand) 18%, transparent);
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--color-brand);
+        outline-offset: 2px;
+    }
+
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible {
+        outline: none;
     }
 }
 
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(100%);
+@layer components {
+    /* Form controls share one look everywhere */
+    .field {
+        width: 100%;
+        border-radius: 0.625rem;
+        border: 1px solid var(--color-line-strong);
+        background: var(--color-surface);
+        padding: 0.625rem 0.75rem;
+        font-size: 0.9375rem;
+        line-height: 1.4;
+        color: var(--color-ink);
+        transition: border-color 0.15s, box-shadow 0.15s;
     }
-    to {
-        opacity: 1;
-        transform: translateX(0);
+    .field::placeholder {
+        color: #a8a29e;
+    }
+    .field:hover {
+        border-color: #bfb6a8;
+    }
+    .field:focus {
+        border-color: var(--color-brand);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 14%, transparent);
+    }
+    .field[aria-invalid="true"] {
+        border-color: #dc2626;
+        box-shadow: 0 0 0 3px rgb(220 38 38 / 0.1);
+    }
+
+    .scrollbar-none {
+        scrollbar-width: none;
+    }
+    .scrollbar-none::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Page-shaped sheet used for previews */
+    .paper {
+        background: white;
+        box-shadow: var(--shadow-paper);
+        border-radius: 4px;
     }
 }
 
-.animate-slide-in-right {
-    animation: slideInRight 0.3s ease-out;
-}
-
-@keyframes pulse-slow {
-    0%,
-    100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.8;
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }
 
-.animate-fade-in {
-    animation: fadeIn 0.6s ease-out;
-}
-
-.animate-slide-in {
-    animation: slideIn 0.5s ease-out;
-}
-
-/* Custom input focus styles */
-input:focus,
-textarea:focus,
-select:focus {
-    outline: none;
-    border-color: var(--primary);
-    ring: 2px;
-    ring-color: rgba(220, 38, 38, 0.15);
-}
-
-/* Typography improvements */
-h1, h2, h3, h4, h5, h6 {
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    line-height: 1.2;
-}
-
-h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    letter-spacing: -0.03em;
-}
-
-h2 {
-    font-size: 2rem;
-    font-weight: 600;
-}
-
-h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
-}
-
-h4 {
-    font-size: 1.25rem;
-    font-weight: 600;
-}
-
-h5 {
-    font-size: 1.125rem;
-    font-weight: 600;
-}
-
-p {
-    line-height: 1.7;
-    color: var(--gray-700);
-}
-
-/* Ensure error messages display in red and override global p styles */
-p.text-red-600 {
-    color: #dc2626 !important;
-}
-
-/* Glassmorphism effect */
-.glass-effect {
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(220, 38, 38, 0.1);
-}
-
-/* Print Styles for Resume */
+/* Print: only the resume sheet, edge to edge */
 @media print {
     * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
-        color-adjust: exact !important;
     }
 
-    html, body {
+    html,
+    body {
         background: white !important;
-        color: black;
         margin: 0;
         padding: 0;
     }
 
-    /* Force white background on page containers in print */
-    body > div,
-    body > div > div {
-        background: white !important;
-        background-color: white !important;
-    }
-
-    /* Ensure resume fits on page with minimal margins */
     #resume-content {
+        width: 100%;
         max-width: 100%;
-        padding: 0.25in !important;
         margin: 0 !important;
+        padding: 0 !important;
         box-shadow: none !important;
         border: none !important;
-        background: white !important;
-        background-color: white !important;
+        border-radius: 0 !important;
+        font-size: 10pt;
+        line-height: 1.35;
     }
 
-    /* Remove page breaks inside sections - try to keep together */
-    section {
-        page-break-inside: avoid;
+    #resume-content section {
         break-inside: avoid;
     }
 
-    /* Prevent orphaned headings */
-    h2 {
-        page-break-after: avoid;
+    #resume-content h2 {
         break-after: avoid;
     }
 
-    /* Better link display for print */
-    a[href]:after {
-        content: none;
-    }
-
-    /* Ensure proper spacing with minimal margins */
-    @page {
-        margin: 0.25in !important;
-        size: letter;
-    }
-
-    /* Optimize font rendering for print */
-    #resume-content {
-        font-size: 10pt;
-        line-height: 1.3;
-    }
-
-    /* Prevent widows and orphans */
-    p, li {
+    #resume-content p,
+    #resume-content li {
         orphans: 3;
         widows: 3;
     }
 
-    /* Compact list spacing */
-    ul, ol {
-        margin: 0;
-        padding-left: 1em;
+    a[href]::after {
+        content: none;
+    }
+
+    @page {
+        margin: 0.45in;
+        size: letter;
     }
 }

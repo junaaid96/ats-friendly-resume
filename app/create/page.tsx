@@ -1,4 +1,4 @@
-import ResumeForm from "@/components/ResumeForm";
+import Editor from "@/components/editor/Editor";
 import { getResumeById } from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
@@ -12,9 +12,9 @@ export default async function CreatePage({
     const { from } = await searchParams;
     const source = from ? await getResumeById(from) : null;
 
-    if (!source) return <ResumeForm key="blank" />;
+    if (!source) return <Editor key="blank" />;
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, createdAt, updatedAt, ...content } = source;
-    return <ResumeForm key={from} initialResume={content} />;
+    return <Editor key={from} initialResume={content} />;
 }
