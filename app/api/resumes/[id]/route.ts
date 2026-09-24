@@ -1,6 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getResumeById, saveResume, deleteResume } from '@/lib/storage';
-import { Resume } from '@/types/resume';
+import { getResumeById, updateResume, deleteResume, OwnershipError } from '@/lib/storage';
+import { sanitizeResume } from '@/lib/sanitize';
+
+const NO_STORE = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+  'Pragma': 'no-cache',
+  'Expires': '0',
+};
+
+const EDIT_TOKEN_HEADER = 'x-edit-token';
+
+function ownershipError(error: OwnershipError) {
+  return error === 'not_found'
+    ? NextResponse.json({ error: 'Resume not found' }, { status: 404 })
+    : NextResponse.json(
+        { error: 'You can only change resumes created in this browser' },
+        { status: 403 }
+      );
+}
 
 export async function GET(
   request: NextRequest,
@@ -17,13 +34,7 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(resume, {
-      headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-      },
-    });
+    return NextResponse.json(resume, { headers: NO_STORE });
   } catch (error) {
     console.error('Error fetching resume:', error);
     return NextResponse.json(
@@ -39,17 +50,15 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const resume: Resume = await request.json();
-    resume.id = id;
+    const resume = sanitizeResume(await request.json().catch(() => null), id);
+    if (!resume) {
+      return NextResponse.json({ error: 'Invalid resume data' }, { status: 400 });
+    }
 
-    const savedResume = await saveResume(resume);
-    return NextResponse.json(savedResume, {
-      headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-      },
-    });
+    const result = await updateResume(id, resume, request.headers.get(EDIT_TOKEN_HEADER));
+    if (typeof result === 'string') return ownershipError(result);
+
+    return NextResponse.json(result, { headers: NO_STORE });
   } catch (error) {
     console.error('Error updating resume:', error);
     return NextResponse.json(
@@ -65,24 +74,12 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const deleted = await deleteResume(id);
-
-    if (!deleted) {
-      return NextResponse.json(
-        { error: 'Resume not found' },
-        { status: 404 }
-      );
-    }
+    const result = await deleteResume(id, request.headers.get(EDIT_TOKEN_HEADER));
+    if (result !== true) return ownershipError(result);
 
     return NextResponse.json(
       { message: 'Resume deleted successfully' },
-      {
-        headers: {
-          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0',
-        },
-      }
+      { headers: NO_STORE }
     );
   } catch (error) {
     console.error('Error deleting resume:', error);

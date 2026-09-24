@@ -14,7 +14,22 @@ A modern, minimalist resume builder application that creates ATS-friendly resume
 - ✅ **Free Forever** - Completely free to use
 - ✅ **Persistent Storage** - Resumes saved to Vercel Postgres (free tier)
 - ✅ **Print/PDF Export** - Export resumes as PDF
-- ✅ **Shareable Links** - Share resumes with unique URLs
+- ✅ **Shareable Links** - Share resumes with unique, view-only URLs
+- ✅ **Live Preview** - See the finished resume update beside the form as you type
+- ✅ **Edit & Duplicate** - Edit saved resumes, or duplicate one to tailor it for a specific job
+- ✅ **Section Layout** - Reorder sections and hide the ones you don't need
+- ✅ **Job Match Checker** - Paste a job description to see covered and missing keywords (runs in the browser)
+- ✅ **Plain-Text & JSON Export** - Copy/download an ATS-ready .txt, back up and re-import as JSON
+- ✅ **Draft Autosave** - Unsaved work on the create page survives a closed tab
+- ✅ **Private by Default** - Resumes are never listed publicly; only the browser that created one can edit or delete it
+
+## Privacy model
+
+- There is no public list of resumes. The home page shows only the resumes created in the current browser.
+- Creating a resume returns a random **edit token** that is kept in the creator's `localStorage`. The database stores only its SHA-256 hash.
+- `PUT` / `DELETE /api/resumes/:id` require the token in the `x-edit-token` header; anyone else gets `403`.
+- Share links are read-only and marked `noindex`. Resumes created before this change have no token, so they are read-only.
+- The API validates and trims incoming resumes (`lib/sanitize.ts`) before saving.
 
 ## Tech Stack
 

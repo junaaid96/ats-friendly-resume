@@ -1,5 +1,20 @@
 import ResumeForm from "@/components/ResumeForm";
+import { getResumeById } from "@/lib/storage";
 
-export default function CreatePage() {
-    return <ResumeForm />;
+export const dynamic = "force-dynamic";
+
+export default async function CreatePage({
+    searchParams,
+}: {
+    searchParams: Promise<{ from?: string }>;
+}) {
+    // "Duplicate": start a new resume pre-filled from an existing one.
+    const { from } = await searchParams;
+    const source = from ? await getResumeById(from) : null;
+
+    if (!source) return <ResumeForm key="blank" />;
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id, createdAt, updatedAt, ...content } = source;
+    return <ResumeForm key={from} initialResume={content} />;
 }

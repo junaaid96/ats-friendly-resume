@@ -1,12 +1,15 @@
 'use client';
 
-import { useState } from 'react';
-import { Resume, WorkExperience, Education, Project, Certification } from '@/types/resume';
+import { useEffect, useRef, useState } from 'react';
+import { Resume, ResumeSettings, WorkExperience, Education, Project, Certification } from '@/types/resume';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { showToast } from '@/components/Toast';
 import TemplateSelector from '@/components/TemplateSelector';
 import AIAssistant from '@/components/AIAssistant';
+import ResumeDocument from '@/components/ResumeDocument';
+import SectionArranger from '@/components/SectionArranger';
+import { clearDraft, getEditToken, loadDraft, rememberResume, saveDraft } from '@/lib/my-resumes';
 import {
   ValidationErrors,
   validateEmail,
@@ -22,13 +25,7 @@ import {
   validateResponsibilities,
 } from '@/lib/validation';
 
-export default function ResumeForm() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<ValidationErrors>({});
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
-
-  const [resume, setResume] = useState<Partial<Resume>>({
+const EMPTY_RESUME: Partial<Resume> = {
     personalInfo: {
       fullName: '',
       email: '',
@@ -45,9 +42,87 @@ export default function ResumeForm() {
     projects: [],
     certifications: [],
     template: 'classic-red',
-  });
+    settings: {},
+};
+
+/** Fills gaps in resumes from older saves or imported JSON so every field the form touches exists. */
+function withDefaults(data: Partial<Resume>): Partial<Resume> {
+  return {
+    ...EMPTY_RESUME,
+    ...data,
+    personalInfo: { ...EMPTY_RESUME.personalInfo!, ...(data.personalInfo || {}) },
+    settings: data.settings || {},
+  };
+}
+
+interface ResumeFormProps {
+  /** `edit` saves back to an existing resume; `create` makes a new one. */
+  mode?: 'create' | 'edit';
+  /** Resume being edited, or the source of a duplicate. */
+  initialResume?: Partial<Resume>;
+}
+
+export default function ResumeForm({ mode = 'create', initialResume }: ResumeFormProps) {
+  const router = useRouter();
+  const isEdit = mode === 'edit' && !!initialResume?.id;
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<ValidationErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  const [resume, setResume] = useState<Partial<Resume>>(() =>
+    withDefaults(initialResume ? { ...initialResume, id: isEdit ? initialResume.id : undefined } : EMPTY_RESUME)
+  );
 
   const [skillInput, setSkillInput] = useState('');
+  const [showPreview, setShowPreview] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
+  // null until checked on the client; false means this browser didn't create the resume.
+  const [canSave, setCanSave] = useState<boolean | null>(isEdit ? null : true);
+  const importInput = useRef<HTMLInputElement>(null);
+  const draftChecked = useRef(false);
+
+  // Restore an unsaved draft on a blank create page, then keep autosaving it.
+  useEffect(() => {
+    if (mode !== 'create' || initialResume) return;
+    if (!draftChecked.current) {
+      draftChecked.current = true;
+      const draft = loadDraft();
+      if (draft?.personalInfo?.fullName || draft?.summary || draft?.experience?.length) {
+        setResume(withDefaults(draft));
+        setDraftRestored(true);
+      }
+      return;
+    }
+    const timer = setTimeout(() => saveDraft(resume), 600);
+    return () => clearTimeout(timer);
+  }, [resume, mode, initialResume]);
+
+  useEffect(() => {
+    if (isEdit) setCanSave(!!getEditToken(initialResume!.id!));
+  }, [isEdit, initialResume]);
+
+  const discardDraft = () => {
+    clearDraft();
+    setResume(withDefaults(EMPTY_RESUME));
+    setDraftRestored(false);
+    setErrors({});
+    setTouched({});
+  };
+
+  const handleImport = async (file: File) => {
+    try {
+      const data = JSON.parse(await file.text());
+      if (typeof data !== 'object' || !data?.personalInfo) throw new Error('not a resume');
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { id, createdAt, updatedAt, editToken, ...content } = data;
+      setResume(withDefaults({ ...content, id: resume.id }));
+      showToast('Resume imported. Review it and save.', 'success');
+    } catch {
+      showToast('That file is not a resume JSON exported from this app.', 'error');
+    }
+  };
+
+  const updateSettings = (settings: ResumeSettings) => setResume({ ...resume, settings });
 
   /**
    * Validates the entire form
@@ -586,21 +661,31 @@ export default function ResumeForm() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/resumes', {
-        method: 'POST',
+      const editToken = isEdit ? getEditToken(resume.id!) : null;
+      if (isEdit && !editToken) {
+        showToast('This resume was created in another browser, so it can only be edited there.', 'error');
+        return;
+      }
+
+      const response = await fetch(isEdit ? `/api/resumes/${resume.id}` : '/api/resumes', {
+        method: isEdit ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(editToken ? { 'x-edit-token': editToken } : {}),
         },
         body: JSON.stringify(resume),
       });
 
       if (response.ok) {
         const savedResume = await response.json();
-        showToast('Resume created successfully!', 'success');
+        rememberResume(savedResume, isEdit ? editToken! : savedResume.editToken);
+        if (!isEdit) clearDraft();
+        showToast(isEdit ? 'Resume updated!' : 'Resume created successfully!', 'success');
         router.push(`/resume/${savedResume.id}`);
+        router.refresh();
       } else {
         const errorData = await response.json().catch(() => ({}));
-        showToast(errorData.message || 'Failed to save resume. Please try again.', 'error');
+        showToast(errorData.error || errorData.message || 'Failed to save resume. Please try again.', 'error');
       }
     } catch (error) {
       console.error('Error saving resume:', error);
@@ -612,7 +697,7 @@ export default function ResumeForm() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 via-rose-50 to-red-50 py-12 px-6">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl xl:max-w-[1400px] mx-auto">
         {/* Back Button */}
         <Link 
           href="/" 
@@ -641,12 +726,66 @@ export default function ResumeForm() {
             </span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3 tracking-tight">
-            Create Your <span className="text-red-600">Resume</span>
+            {isEdit ? 'Edit Your' : 'Create Your'} <span className="text-red-600">Resume</span>
           </h1>
-          <p className="text-gray-600 text-base font-light">Fill in your professional information below</p>
+          <p className="text-gray-600 text-base font-light">
+            {isEdit
+              ? 'Changes are saved to the same share link'
+              : initialResume
+                ? 'Started from a copy of an existing resume. Tailor it, then save it as a new one'
+                : 'Fill in your professional information below'}
+          </p>
+          <div className="mt-5 flex flex-wrap justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => importInput.current?.click()}
+              className="border border-gray-300 bg-white text-gray-700 px-4 py-2 rounded-lg hover:border-red-300 hover:text-red-700 transition-colors font-medium text-sm"
+            >
+              Import JSON
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowPreview((v) => !v)}
+              className="xl:hidden border border-gray-300 bg-white text-gray-700 px-4 py-2 rounded-lg hover:border-red-300 hover:text-red-700 transition-colors font-medium text-sm"
+            >
+              {showPreview ? 'Hide preview' : 'Show live preview'}
+            </button>
+            <input
+              ref={importInput}
+              type="file"
+              accept="application/json,.json"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleImport(file);
+                e.target.value = '';
+              }}
+            />
+          </div>
         </div>
 
-    <form onSubmit={handleSubmit} className="space-y-6">
+        {draftRestored && (
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <span>We restored the draft you were working on.</span>
+            <button type="button" onClick={discardDraft} className="font-semibold hover:underline">
+              Start over
+            </button>
+          </div>
+        )}
+
+        {canSave === false && (
+          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+            This resume was created in another browser, so it can only be edited there. You can still{' '}
+            <Link href={`/create?from=${resume.id}`} className="font-semibold underline">
+              duplicate it
+            </Link>{' '}
+            and save your own copy.
+          </div>
+        )}
+
+        <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:gap-8 xl:items-start">
+
+    <form onSubmit={handleSubmit} className="space-y-6 min-w-0">
 
       {/* Template Selection */}
       <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
@@ -656,6 +795,11 @@ export default function ResumeForm() {
             setResume({ ...resume, template: templateId });
           }}
         />
+      </section>
+
+      {/* Section order and visibility */}
+      <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <SectionArranger resume={resume} onChange={updateSettings} />
       </section>
 
       {/* AI Assistant */}
@@ -1585,13 +1729,38 @@ export default function ResumeForm() {
       <div className="flex justify-center pt-4">
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || canSave === false}
           className="bg-red-600 text-white px-10 py-4 rounded-lg hover:bg-red-700 hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed text-base font-semibold"
         >
-          {loading ? '⏳ Creating Resume...' : '✓ Create Resume'}
+          {loading
+            ? isEdit ? '⏳ Saving...' : '⏳ Creating Resume...'
+            : isEdit ? '✓ Save Changes' : '✓ Create Resume'}
         </button>
       </div>
     </form>
+
+        {/* Live preview: always beside the form on wide screens, toggled on smaller ones */}
+        <aside
+          className={`${showPreview ? 'fixed inset-0 z-[60] overflow-y-auto bg-gray-900/95 p-4' : 'hidden'} xl:block xl:bg-transparent xl:p-0 xl:sticky xl:inset-auto xl:z-auto xl:top-6 xl:max-h-[calc(100vh-3rem)] xl:overflow-y-auto xl:rounded-xl`}
+          aria-label="Live preview"
+        >
+          <div className="max-w-3xl mx-auto">
+            <div className="mb-3 flex items-center justify-between">
+              <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-white xl:text-gray-500">
+                <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" /> Live preview
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowPreview(false)}
+                className="xl:hidden bg-white text-gray-800 px-3 py-1.5 rounded-lg text-sm font-medium"
+              >
+                Close
+              </button>
+            </div>
+            <ResumeDocument resume={resume} />
+          </div>
+        </aside>
+        </div>
       </div>
     </div>
   );

@@ -1,44 +1,30 @@
+import { randomBytes } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllResumes, saveResume } from '@/lib/storage';
-import { Resume } from '@/types/resume';
+import { createResume } from '@/lib/storage';
+import { sanitizeResume } from '@/lib/sanitize';
 
-export async function GET() {
-  try {
-    const resumes = await getAllResumes();
-    return NextResponse.json(resumes, {
-      headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-      },
-    });
-  } catch (error) {
-    console.error('Error fetching resumes:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch resumes' },
-      { status: 500 }
-    );
-  }
-}
+const NO_STORE = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+  'Pragma': 'no-cache',
+  'Expires': '0',
+};
+
+// There is deliberately no GET here: resumes hold personal contact details,
+// so they are only readable one at a time by their unguessable share link.
 
 export async function POST(request: NextRequest) {
   try {
-    const resume: Resume = await request.json();
+    const body = await request.json().catch(() => null);
+    const id = `resume-${Date.now()}-${randomBytes(9).toString('base64url')}`;
+    const resume = sanitizeResume(body, id);
 
-    // Generate ID if not provided
-    if (!resume.id) {
-      resume.id = `resume-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    if (!resume) {
+      return NextResponse.json({ error: 'Invalid resume data' }, { status: 400 });
     }
 
-    const savedResume = await saveResume(resume);
-    return NextResponse.json(savedResume, {
-      status: 201,
-      headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-      },
-    });
+    const { resume: saved, editToken } = await createResume(resume);
+    // The edit token is only ever returned here; the client keeps it locally.
+    return NextResponse.json({ ...saved, editToken }, { status: 201, headers: NO_STORE });
   } catch (error) {
     console.error('Error creating resume:', error);
     return NextResponse.json(
