@@ -8,6 +8,7 @@ export interface Resume {
   projects?: Project[];
   certifications?: Certification[];
   template?: string;
+  settings?: ResumeSettings;
   createdAt: string;
   updatedAt: string;
 }
@@ -59,4 +60,19 @@ export interface Certification {
   date: string;
   expiryDate?: string;
   credentialId?: string;
+}
+
+export type SectionKey =
+  | 'summary'
+  | 'experience'
+  | 'education'
+  | 'skills'
+  | 'projects'
+  | 'certifications';
+
+export interface ResumeSettings {
+  /** Display order of the body sections. Missing keys fall back to the default order. */
+  sectionOrder?: SectionKey[];
+  /** Sections that are kept in the data but not rendered. */
+  hiddenSections?: SectionKey[];
 }
