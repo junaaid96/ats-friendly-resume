@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
 import { ToastContainer } from "@/components/Toast";
 
@@ -9,10 +9,21 @@ const inter = Inter({
     display: "swap",
 });
 
+const fraunces = Fraunces({
+    variable: "--font-fraunces",
+    subsets: ["latin"],
+    display: "swap",
+    axes: ["opsz", "SOFT"],
+});
+
 export const metadata: Metadata = {
     title: "Arvix Resume Builder - ATS Friendly Resume Creator",
     description:
-        "Create professional, ATS-friendly resumes that pass applicant tracking systems and impress recruiters. Build your dream career with Arvix.",
+        "Create professional, ATS-friendly resumes with a live preview, AI writing help and a job match checker. Free, private, and ready to print.",
+};
+
+export const viewport: Viewport = {
+    themeColor: "#faf8f5",
 };
 
 export default function RootLayout({
@@ -21,9 +32,10 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
+        // Font variables go on <html> so the theme's --font-* tokens (defined on :root) can resolve them.
+        <html lang="en" className={`${inter.variable} ${fraunces.variable}`}>
             <body
-                className={`${inter.variable} font-sans antialiased`}
+                className="font-sans antialiased"
                 suppressHydrationWarning
             >
                 {children}

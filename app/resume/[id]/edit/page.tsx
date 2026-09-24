@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import ResumeForm from "@/components/ResumeForm";
+import Editor from "@/components/editor/Editor";
 import { getResumeById } from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
@@ -20,5 +20,5 @@ export default async function EditResumePage({
     if (!resume) notFound();
 
     // Ownership is checked in the browser (edit token) and again by the API on save.
-    return <ResumeForm mode="edit" initialResume={resume} />;
+    return <Editor mode="edit" initialResume={resume} />;
 }

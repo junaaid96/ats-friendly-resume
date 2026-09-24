@@ -4,9 +4,9 @@ import { getTemplate } from '@/lib/templates';
 import { isSectionHidden, orderedSections, SECTION_LABELS } from '@/lib/sections';
 
 /**
- * The printable resume. Shared by the resume page and the editor's live
- * preview so both always look the same. Pure markup, no hooks, so it works
- * in server and client components.
+ * The printable resume. Shared by the resume page, the editor preview and
+ * the landing page sample so they always match. Single column, real text and
+ * standard headings keep it ATS-friendly. Pure markup, no hooks.
  */
 
 export const formatDate = (dateString?: string) => {
@@ -18,8 +18,24 @@ export const formatDate = (dateString?: string) => {
   return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 };
 
-export default function ResumeDocument({ resume }: { resume: Partial<Resume> }) {
+const dateRange = (start?: string, end?: string, current?: boolean) =>
+  [formatDate(start), current ? 'Present' : formatDate(end)].filter(Boolean).join(' – ');
+
+const BULLETS = { disc: 'list-disc', circle: 'list-[circle]', square: 'list-[square]' } as const;
+
+export default function ResumeDocument({
+  resume,
+  className = '',
+  printable = true,
+}: {
+  resume: Partial<Resume>;
+  className?: string;
+  /** The printable copy carries id="resume-content", which the print stylesheet targets. */
+  printable?: boolean;
+}) {
   const template = getTemplate(resume.template);
+  const { primary } = template.colors;
+  const { headerAlign, sectionDivider, bulletStyle } = template.styles;
   const personal = resume.personalInfo || { fullName: '', email: '', phone: '', location: '' };
   const experience = resume.experience || [];
   const education = resume.education || [];
@@ -27,212 +43,176 @@ export default function ResumeDocument({ resume }: { resume: Partial<Resume> }) 
   const projects = resume.projects || [];
   const certifications = resume.certifications || [];
 
-  const heading = (key: SectionKey, spacing = 'mb-2 print:mb-1') => (
-    <h3
-      className={`font-semibold ${spacing} uppercase print:text-black tracking-wide`}
-      style={{ color: template.colors.primary }}
+  const align = headerAlign === 'center' ? 'text-center' : headerAlign === 'right' ? 'text-right' : 'text-left';
+  const rowAlign = headerAlign === 'center' ? 'justify-center' : headerAlign === 'right' ? 'justify-end' : 'justify-start';
+  const bullets = BULLETS[bulletStyle] || 'list-disc';
+
+  const heading = (key: SectionKey) => (
+    <h2
+      className="mb-2 flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.14em] print:tracking-normal"
+      style={{ color: primary }}
     >
       {SECTION_LABELS[key]}
-    </h3>
+      {sectionDivider !== 'space' && (
+        <span
+          aria-hidden
+          className="flex-1"
+          style={{ borderTop: `${sectionDivider === 'border' ? 1.5 : 1}px solid ${primary}`, opacity: 0.55 }}
+        />
+      )}
+    </h2>
   );
 
-  const contact = [personal.email, personal.phone, personal.location].filter(Boolean);
-  const links = [
-    { label: 'LinkedIn', href: personal.linkedin },
-    { label: 'Website', href: personal.website },
-    { label: 'GitHub', href: personal.github },
-  ].filter((l) => l.href);
+  const entryHeader = (title: ReactNode, subtitle: ReactNode, place?: string, when?: string) => (
+    <div className="flex items-start justify-between gap-4">
+      <div className="min-w-0">
+        <h3 className="text-[13px] font-semibold leading-snug text-neutral-900">{title}</h3>
+        {subtitle && <p className="text-[12px] leading-snug text-neutral-700">{subtitle}</p>}
+      </div>
+      {(place || when) && (
+        <div className="shrink-0 text-right text-[11.5px] leading-snug text-neutral-600">
+          {when && <p className="whitespace-nowrap font-medium text-neutral-800">{when}</p>}
+          {place && <p className="whitespace-nowrap">{place}</p>}
+        </div>
+      )}
+    </div>
+  );
 
   const sections: Record<SectionKey, ReactNode> = {
     summary: resume.summary ? (
-      <section className="mb-4 print:mb-3">
-        {heading('summary', 'mb-1 print:mb-0.5')}
-        <p className="text-xs print:text-xs text-black leading-relaxed print:leading-snug font-light mt-1 print:mt-0.5 whitespace-pre-line">
-          {resume.summary}
-        </p>
+      <section className="mb-4">
+        {heading('summary')}
+        <p className="whitespace-pre-line text-[12px] leading-relaxed text-neutral-800">{resume.summary}</p>
       </section>
     ) : null,
 
     experience: experience.length ? (
-      <section className="mb-4 print:mb-3">
+      <section className="mb-4">
         {heading('experience')}
-        {experience.map((exp, idx) => (
-          <div key={exp.id} className={idx < experience.length - 1 ? 'mb-2.5 print:mb-2' : 'mb-0'}>
-            <div className="flex justify-between items-start mb-0.5 print:mb-0 gap-2">
-              <div className="flex-1 min-w-0">
-                <h5 className="font-bold text-sm print:text-xs text-black leading-tight">{exp.position}</h5>
-                <p className="text-xs print:text-xs text-black font-medium leading-tight">{exp.company}</p>
-              </div>
-              <div className="text-right text-xs print:text-xs text-black leading-tight flex-shrink-0">
-                <p className="whitespace-nowrap">{exp.location}</p>
-                <p className="whitespace-nowrap">
-                  {formatDate(exp.startDate)}
-                  {(exp.startDate || exp.endDate || exp.current) && ' - '}
-                  {exp.current ? 'Present' : formatDate(exp.endDate)}
-                </p>
-              </div>
-            </div>
-            <ul className="list-disc list-inside space-y-0.5 print:space-y-0 text-xs print:text-xs text-black ml-1 print:ml-0.5 leading-relaxed print:leading-snug">
-              {(exp.responsibilities || [])
-                .filter((r) => r.trim())
-                .map((resp, i) => (
-                  <li key={i} className="leading-relaxed print:leading-snug">{resp}</li>
-                ))}
-            </ul>
-          </div>
-        ))}
+        <div className="space-y-3">
+          {experience.map((exp) => (
+            <article key={exp.id}>
+              {entryHeader(exp.position, exp.company, exp.location, dateRange(exp.startDate, exp.endDate, exp.current))}
+              {(exp.responsibilities || []).some((r) => r.trim()) && (
+                <ul className={`${bullets} mt-1 space-y-0.5 pl-4 text-[12px] leading-relaxed text-neutral-800 marker:text-neutral-500`}>
+                  {exp.responsibilities
+                    .filter((r) => r.trim())
+                    .map((resp, i) => (
+                      <li key={i}>{resp}</li>
+                    ))}
+                </ul>
+              )}
+            </article>
+          ))}
+        </div>
       </section>
     ) : null,
 
     education: education.length ? (
-      <section className="mb-4 print:mb-3">
+      <section className="mb-4">
         {heading('education')}
-        {education.map((edu, idx) => (
-          <div key={edu.id} className={idx < education.length - 1 ? 'mb-2 print:mb-1.5' : 'mb-0'}>
-            <div className="flex justify-between items-start gap-2">
-              <div className="flex-1 min-w-0">
-                <h5 className="font-bold text-sm print:text-xs text-black leading-tight">
-                  {[edu.degree, edu.field].filter(Boolean).join(' in ')}
-                </h5>
-                <p className="text-xs print:text-xs text-black leading-tight">{edu.institution}</p>
-                {edu.gpa && <p className="text-xs print:text-xs text-black leading-tight">GPA: {edu.gpa}</p>}
-              </div>
-              <div className="text-right text-xs print:text-xs text-black leading-tight flex-shrink-0">
-                <p className="whitespace-nowrap">{edu.location}</p>
-                <p className="whitespace-nowrap">
-                  {formatDate(edu.startDate)}
-                  {edu.startDate && edu.endDate && ' - '}
-                  {formatDate(edu.endDate)}
-                </p>
-              </div>
-            </div>
-          </div>
-        ))}
+        <div className="space-y-2.5">
+          {education.map((edu) => (
+            <article key={edu.id}>
+              {entryHeader(
+                [edu.degree, edu.field].filter(Boolean).join(' in '),
+                [edu.institution, edu.gpa && `GPA ${edu.gpa}`].filter(Boolean).join(' · '),
+                edu.location,
+                dateRange(edu.startDate, edu.endDate)
+              )}
+            </article>
+          ))}
+        </div>
       </section>
     ) : null,
 
     skills: skills.length ? (
-      <section className="mb-4 print:mb-3">
-        {heading('skills', 'mb-1 print:mb-0.5')}
-        <p className="text-xs print:text-xs text-black font-light leading-relaxed print:leading-snug mt-1 print:mt-0.5">
-          {skills.join(' • ')}
-        </p>
+      <section className="mb-4">
+        {heading('skills')}
+        <p className="text-[12px] leading-relaxed text-neutral-800">{skills.join(' · ')}</p>
       </section>
     ) : null,
 
     projects: projects.length ? (
-      <section className="mb-4 print:mb-3">
+      <section className="mb-4">
         {heading('projects')}
-        {projects.map((project, idx) => (
-          <div key={project.id} className={idx < projects.length - 1 ? 'mb-2 print:mb-1.5' : 'mb-0'}>
-            <h5 className="font-bold text-sm print:text-xs text-black leading-tight">
-              {project.name}
-              {project.link && (
-                <>
-                  {' '}
-                  <span className="text-black">-</span>{' '}
-                  <a
-                    href={project.link}
-                    className="text-black hover:underline text-xs print:text-xs font-normal break-all"
-                  >
-                    {project.link}
+        <div className="space-y-2.5">
+          {projects.map((project) => (
+            <article key={project.id}>
+              <h3 className="text-[13px] font-semibold leading-snug text-neutral-900">
+                {project.name}
+                {project.link && (
+                  <a href={project.link} className="ml-2 break-all text-[11.5px] font-normal text-neutral-600 hover:underline">
+                    {project.link.replace(/^https?:\/\//, '')}
                   </a>
-                </>
+                )}
+              </h3>
+              {project.description && (
+                <p className="text-[12px] leading-relaxed text-neutral-800">{project.description}</p>
               )}
-            </h5>
-            <p className="text-xs print:text-xs text-black mb-0.5 print:mb-0 leading-relaxed print:leading-snug mt-0.5 print:mt-0">
-              {project.description}
-            </p>
-            {project.technologies?.length > 0 && (
-              <p className="text-xs print:text-xs text-black leading-tight">
-                <span className="font-medium">Technologies:</span> {project.technologies.join(', ')}
-              </p>
-            )}
-          </div>
-        ))}
+              {project.technologies?.length > 0 && (
+                <p className="text-[11.5px] leading-snug text-neutral-600">
+                  <span className="font-medium text-neutral-800">Tech:</span> {project.technologies.join(', ')}
+                </p>
+              )}
+            </article>
+          ))}
+        </div>
       </section>
     ) : null,
 
     certifications: certifications.length ? (
-      <section className="mb-4 print:mb-3">
+      <section className="mb-4">
         {heading('certifications')}
-        {certifications.map((cert, idx) => (
-          <div key={cert.id} className={idx < certifications.length - 1 ? 'mb-1.5 print:mb-1' : 'mb-0'}>
-            <div className="flex justify-between items-start gap-2">
-              <div className="flex-1 min-w-0">
-                <h5 className="font-bold text-sm print:text-xs text-black leading-tight">{cert.name}</h5>
-                <p className="text-xs print:text-xs text-black leading-tight">{cert.issuer}</p>
-                {cert.credentialId && (
-                  <p className="text-xs print:text-xs text-black leading-tight">ID: {cert.credentialId}</p>
-                )}
-              </div>
-              <div className="text-right text-xs print:text-xs text-black leading-tight flex-shrink-0">
-                {cert.date && <p className="whitespace-nowrap">Issued: {formatDate(cert.date)}</p>}
-                {cert.expiryDate && <p className="whitespace-nowrap">Expires: {formatDate(cert.expiryDate)}</p>}
-              </div>
-            </div>
-          </div>
-        ))}
+        <div className="space-y-2">
+          {certifications.map((cert) => (
+            <article key={cert.id}>
+              {entryHeader(
+                cert.name,
+                [cert.issuer, cert.credentialId && `ID ${cert.credentialId}`].filter(Boolean).join(' · '),
+                cert.expiryDate ? `Expires ${formatDate(cert.expiryDate)}` : undefined,
+                formatDate(cert.date)
+              )}
+            </article>
+          ))}
+        </div>
       </section>
     ) : null,
   };
 
-  const align =
-    template.styles.headerAlign === 'center'
-      ? 'text-center'
-      : template.styles.headerAlign === 'right'
-        ? 'text-right'
-        : 'text-left';
-  const rowAlign =
-    template.styles.headerAlign === 'center'
-      ? 'justify-center'
-      : template.styles.headerAlign === 'right'
-        ? 'justify-end'
-        : 'justify-start';
+  const contact = [personal.email, personal.phone, personal.location].filter(Boolean);
+  const links = [
+    { label: 'LinkedIn', href: personal.linkedin },
+    { label: 'Portfolio', href: personal.website },
+    { label: 'GitHub', href: personal.github },
+  ].filter((l) => l.href);
 
   return (
     <div
-      className="bg-white shadow-sm border border-gray-200 p-6 print:p-4 print:shadow-none print:border-0 rounded-xl print:rounded-none"
-      id="resume-content"
+      id={printable ? 'resume-content' : undefined}
+      className={`bg-white px-10 py-9 font-sans text-neutral-900 print:px-0 print:py-0 ${className}`}
     >
-      <header className={`pb-2 mb-3 print:pb-1.5 print:mb-2 ${align}`}>
-        <h1
-          className="text-[1.5rem] print:text-[1.5rem] font-bold mb-1 print:mb-0.5 print:text-black tracking-tight"
-          style={{ color: template.colors.primary }}
-        >
+      <header className={`mb-5 ${align}`}>
+        <h1 className="text-[26px] font-bold leading-tight tracking-tight" style={{ color: primary }}>
           {personal.fullName || 'Your Name'}
         </h1>
-        {contact.length > 0 && (
-          <div className={`flex flex-wrap ${rowAlign} gap-x-3 gap-y-0.5 text-xs print:text-xs text-black leading-tight`}>
-            {contact.map((item, i) => (
-              <span key={i} className="flex gap-x-3">
-                {i > 0 && <span aria-hidden>•</span>}
-                <span>{item}</span>
+        {resume.experience?.[0]?.position && (
+          <p className="mt-0.5 text-[13px] font-medium text-neutral-700">{resume.experience[0].position}</p>
+        )}
+        {(contact.length > 0 || links.length > 0) && (
+          <div className={`mt-2 flex flex-wrap ${rowAlign} gap-x-2 gap-y-0.5 text-[11.5px] text-neutral-700`}>
+            {[...contact.map((c) => <span key={c}>{c}</span>), ...links.map((l) => (
+              <a key={l.label} href={l.href} className="hover:underline">
+                {l.label}
+              </a>
+            ))].map((node, i) => (
+              <span key={i} className="inline-flex gap-x-2">
+                {i > 0 && <span aria-hidden className="text-neutral-400">|</span>}
+                {node}
               </span>
             ))}
           </div>
         )}
-        {links.length > 0 && (
-          <div className={`flex flex-wrap ${rowAlign} gap-x-3 gap-y-0.5 text-xs print:text-xs text-black mt-1 print:mt-0.5 leading-tight`}>
-            {links.map((link, i) => (
-              <span key={link.label} className="flex gap-x-3">
-                {i > 0 && <span aria-hidden>•</span>}
-                <a href={link.href} className="text-black hover:underline print:text-black">
-                  {link.label}
-                </a>
-              </span>
-            ))}
-          </div>
-        )}
-        <div
-          className="mt-3 print:mt-2"
-          style={{
-            borderBottom:
-              template.styles.sectionDivider !== 'space'
-                ? `${template.styles.sectionDivider === 'border' ? '2px' : '1px'} solid ${template.colors.primary}`
-                : 'none',
-          }}
-        />
       </header>
 
       {orderedSections(resume)

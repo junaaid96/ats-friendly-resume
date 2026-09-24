@@ -1,64 +1,36 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import { showToast } from '@/components/Toast';
+import { Button } from '@/components/ui/Button';
+import Icon from '@/components/ui/Icon';
 
-interface ShareResumeProps {
-  resumeId: string;
-}
+const noop = () => () => {};
 
-export default function ShareResume({ resumeId }: ShareResumeProps) {
-  const [shareUrl, setShareUrl] = useState('');
+export default function ShareResume() {
+  // The page URL is only known in the browser; render a placeholder on the server.
+  const shareUrl = useSyncExternalStore(noop, () => window.location.href, () => '');
 
-  useEffect(() => {
-    // Only set the URL on the client side to avoid hydration mismatch
-    if (typeof window !== 'undefined') {
-      setShareUrl(window.location.href);
-    }
-  }, []);
-
-  const handleCopyLink = async () => {
+  const copy = async () => {
     try {
-      if (typeof window !== 'undefined' && navigator.clipboard) {
-        await navigator.clipboard.writeText(window.location.href);
-        showToast('Link copied to clipboard!', 'success');
-      }
-    } catch (error) {
-      console.error('Failed to copy link:', error);
-      // Fallback for browsers that don't support clipboard API
-      const textArea = document.createElement('textarea');
-      textArea.value = window.location.href;
-      document.body.appendChild(textArea);
-      textArea.select();
-      try {
-        document.execCommand('copy');
-        showToast('Link copied to clipboard!', 'success');
-      } catch (err) {
-        console.error('Fallback copy failed:', err);
-        showToast('Failed to copy link. Please try again.', 'error');
-      }
-      document.body.removeChild(textArea);
+      await navigator.clipboard.writeText(window.location.href);
+      showToast('Link copied', 'success');
+    } catch {
+      showToast('Could not copy. Select the link and copy it manually.', 'error');
     }
   };
 
   return (
-    <div className="mt-6 p-4 bg-red-50 rounded-lg border border-red-100 print:hidden">
-      <h3 className="font-semibold mb-2 text-gray-900">Share this resume:</h3>
+    <div>
       <div className="flex gap-2">
-        <input
-          type="text"
-          readOnly
-          value={shareUrl}
-          className="flex-1 border border-gray-300 p-2.5 rounded-lg bg-white text-sm"
-        />
-        <button
-          onClick={handleCopyLink}
-          className="bg-red-600 text-white px-4 py-2.5 rounded-lg hover:bg-red-700 transition-colors font-medium text-sm"
-        >
-          Copy Link
-        </button>
+        <input readOnly value={shareUrl} aria-label="Share link" onFocus={(e) => e.target.select()}
+          className="field min-w-0 flex-1 truncate !py-2 text-[13px] text-ink-2" />
+        <Button variant="primary" size="md" icon="link" onClick={copy}>Copy</Button>
       </div>
+      <p className="mt-2 flex items-start gap-1.5 text-xs text-muted">
+        <Icon name="lock" size={13} className="mt-0.5 shrink-0" />
+        Anyone with the link can view it. It isn&apos;t listed anywhere or indexed by search engines.
+      </p>
     </div>
   );
 }
-

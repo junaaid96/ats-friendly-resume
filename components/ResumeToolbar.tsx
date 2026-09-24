@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useSyncExternalStore } from 'react';
-import Link from 'next/link';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { Resume } from '@/types/resume';
 import { forgetResume, getEditToken, MY_RESUMES_EVENT } from '@/lib/my-resumes';
 import { resumeToPlainText } from '@/lib/resume-text';
 import { showToast } from '@/components/Toast';
+import Logo from '@/components/ui/Logo';
+import Icon, { IconName } from '@/components/ui/Icon';
+import { Button, ButtonLink } from '@/components/ui/Button';
 
 const slug = (name: string) =>
   name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'resume';
@@ -29,20 +31,47 @@ function subscribe(onChange: () => void) {
   };
 }
 
-const button =
-  'px-3 py-2 rounded-lg text-sm font-medium border border-gray-300 bg-white text-gray-700 hover:border-gray-400 transition-colors';
+/** Only the browser that created the resume holds its edit token. */
+export function useEditToken(id: string) {
+  return useSyncExternalStore(subscribe, () => getEditToken(id), () => null);
+}
 
-export default function ResumeToolbar({ resume, color }: { resume: Resume; color: string }) {
-  const router = useRouter();
-  // Only the browser that created the resume holds its edit token.
-  const editToken = useSyncExternalStore(
-    subscribe,
-    () => getEditToken(resume.id),
-    () => null
+function MenuItem({ icon, children, onClick, danger }: { icon: IconName; children: string; onClick: () => void; danger?: boolean }) {
+  return (
+    <button type="button" role="menuitem" onClick={onClick}
+      className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm ${
+        danger ? 'text-brand hover:bg-brand-soft' : 'text-ink-2 hover:bg-paper-2 hover:text-ink'
+      }`}>
+      <Icon name={icon} size={16} />
+      {children}
+    </button>
   );
-  const [menuOpen, setMenuOpen] = useState(false);
+}
 
+export default function ResumeToolbar({ resume }: { resume: Resume }) {
+  const router = useRouter();
+  const editToken = useEditToken(resume.id);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   const name = slug(resume.personalInfo.fullName);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = (e: MouseEvent | KeyboardEvent) => {
+      if (e instanceof KeyboardEvent ? e.key === 'Escape' : !menuRef.current?.contains(e.target as Node)) setMenuOpen(false);
+    };
+    document.addEventListener('mousedown', close);
+    document.addEventListener('keydown', close);
+    return () => {
+      document.removeEventListener('mousedown', close);
+      document.removeEventListener('keydown', close);
+    };
+  }, [menuOpen]);
+
+  const run = (fn: () => void) => () => {
+    setMenuOpen(false);
+    fn();
+  };
 
   const copyText = async () => {
     try {
@@ -60,12 +89,8 @@ export default function ResumeToolbar({ resume, color }: { resume: Resume; color
   };
 
   const handleDelete = async () => {
-    if (!editToken) return;
-    if (!window.confirm('Delete this resume? The share link will stop working.')) return;
-    const response = await fetch(`/api/resumes/${resume.id}`, {
-      method: 'DELETE',
-      headers: { 'x-edit-token': editToken },
-    });
+    if (!editToken || !window.confirm('Delete this resume? The share link will stop working.')) return;
+    const response = await fetch(`/api/resumes/${resume.id}`, { method: 'DELETE', headers: { 'x-edit-token': editToken } });
     if (response.ok) {
       forgetResume(resume.id);
       showToast('Resume deleted', 'success');
@@ -76,75 +101,52 @@ export default function ResumeToolbar({ resume, color }: { resume: Resume; color
   };
 
   return (
-    <div className="mb-4 flex flex-wrap justify-between items-center gap-3 print:hidden">
-      <Link
-        href="/"
-        className="font-medium text-sm flex items-center gap-1 hover:underline"
-        style={{ color }}
-      >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-        Back to Home
-      </Link>
+    <header className="sticky top-0 z-40 border-b border-line bg-paper/85 backdrop-blur-md print:hidden">
+      <div className="mx-auto flex h-14 max-w-[1280px] items-center gap-3 px-4 sm:px-6">
+        <Logo compact />
+        <span className="hidden h-6 w-px bg-line sm:block" />
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold text-ink">{resume.personalInfo.fullName}</p>
+          <p className="truncate text-xs text-muted">
+            Updated {new Date(resume.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+          </p>
+        </div>
 
-      <div className="flex flex-wrap items-center gap-2">
         {editToken && (
-          <Link href={`/resume/${resume.id}/edit`} className={button}>
+          <ButtonLink href={`/resume/${resume.id}/edit`} variant="secondary" size="sm" icon="pencil">
             Edit
-          </Link>
+          </ButtonLink>
         )}
-        <div className="relative">
-          <button
-            type="button"
-            className={button}
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen((o) => !o)}
-          >
-            Export ▾
-          </button>
+        <div className="relative" ref={menuRef}>
+          <Button variant="secondary" size="sm" iconRight="chevronDown" aria-haspopup="menu" aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((o) => !o)}>
+            <span className="hidden sm:inline">More</span>
+            <span className="sm:hidden">
+              <Icon name="more" size={15} />
+            </span>
+          </Button>
           {menuOpen && (
-            <div
-              className="absolute right-0 mt-2 w-56 rounded-lg border border-gray-200 bg-white shadow-lg z-20 py-1 text-sm"
-              onClick={() => setMenuOpen(false)}
-            >
-              <button type="button" className="w-full text-left px-4 py-2 hover:bg-gray-50" onClick={copyText}>
-                Copy as plain text
-              </button>
-              <button
-                type="button"
-                className="w-full text-left px-4 py-2 hover:bg-gray-50"
-                onClick={() => download(`${name}.txt`, resumeToPlainText(resume), 'text/plain')}
-              >
+            <div role="menu" className="animate-toast absolute right-0 z-50 mt-2 w-60 rounded-xl border border-line bg-surface p-1.5 shadow-pop">
+              <MenuItem icon="copy" onClick={run(copyText)}>Copy as plain text</MenuItem>
+              <MenuItem icon="file" onClick={run(() => download(`${name}.txt`, resumeToPlainText(resume), 'text/plain'))}>
                 Download .txt (ATS)
-              </button>
-              <button type="button" className="w-full text-left px-4 py-2 hover:bg-gray-50" onClick={exportJson}>
-                Download .json (backup)
-              </button>
-              <Link href={`/create?from=${resume.id}`} className="block px-4 py-2 hover:bg-gray-50">
-                Duplicate as new resume
-              </Link>
+              </MenuItem>
+              <MenuItem icon="download" onClick={run(exportJson)}>Download .json backup</MenuItem>
+              <MenuItem icon="copy" onClick={run(() => router.push(`/create?from=${resume.id}`))}>Duplicate to tailor</MenuItem>
               {editToken && (
-                <button
-                  type="button"
-                  className="w-full text-left px-4 py-2 text-red-700 hover:bg-red-50 border-t border-gray-100"
-                  onClick={handleDelete}
-                >
-                  Delete resume
-                </button>
+                <>
+                  <div className="my-1 h-px bg-line" />
+                  <MenuItem icon="trash" danger onClick={run(handleDelete)}>Delete resume</MenuItem>
+                </>
               )}
             </div>
           )}
         </div>
-        <button
-          type="button"
-          onClick={() => window.print()}
-          className="text-white px-4 py-2 rounded-lg transition-opacity hover:opacity-90 font-medium text-sm"
-          style={{ backgroundColor: color }}
-        >
-          Print / Save as PDF
-        </button>
+        <Button variant="primary" size="sm" icon="printer" onClick={() => window.print()}>
+          <span className="hidden sm:inline">Download PDF</span>
+          <span className="sm:hidden">PDF</span>
+        </Button>
       </div>
-    </div>
+    </header>
   );
 }
