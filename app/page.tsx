@@ -4,6 +4,7 @@ import PaperPreview from "@/components/PaperPreview";
 import Logo from "@/components/ui/Logo";
 import Icon, { IconName } from "@/components/ui/Icon";
 import { ButtonLink } from "@/components/ui/Button";
+import CreditPill from "@/components/CreditPill";
 import { SAMPLE_RESUME } from "@/lib/sample-resume";
 import { templates } from "@/lib/templates";
 
@@ -180,6 +181,7 @@ export default function Home() {
                 <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-8 text-sm text-muted sm:px-6">
                     <Logo />
                     <p>Free and private. Your resumes never appear in a public list.</p>
+                    <CreditPill />
                 </div>
             </footer>
         </div>
