@@ -4,6 +4,8 @@ import { SVGProps } from 'react';
 const PATHS = {
   arrowLeft: 'M19 12H5m6-6-6 6 6 6',
   arrowRight: 'M5 12h14m-6-6 6 6-6 6',
+  arrowUpRight: 'M7 17 17 7M7 7h10v10',
+  code: 'm16 18 6-6-6-6M8 6l-6 6 6 6',
   check: 'm5 12.5 4.5 4.5L19 7',
   plus: 'M12 5v14M5 12h14',
   x: 'M6 6l12 12M18 6 6 18',
