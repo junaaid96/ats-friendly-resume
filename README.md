@@ -2,6 +2,8 @@
 
 A modern, minimalist resume builder application that creates ATS-friendly resumes. Built with Next.js, TypeScript, and Tailwind CSS.
 
+**Live:** [arvix-resume.vercel.app](https://arvix-resume.vercel.app/) · Case study: [junaidul.pro.bd/project/arvix-resume-builder](https://junaidul.pro.bd/project/arvix-resume-builder)
+
 ## Features
 
 - ✅ **ATS-Optimized** - Creates resumes that pass applicant tracking systems
@@ -22,6 +24,7 @@ A modern, minimalist resume builder application that creates ATS-friendly resume
 - ✅ **Plain-Text & JSON Export** - Copy/download an ATS-ready .txt, back up and re-import as JSON
 - ✅ **Draft Autosave** - Unsaved work on the create page survives a closed tab
 - ✅ **Private by Default** - Resumes are never listed publicly; only the browser that created one can edit or delete it
+- ✅ **Developer credit** - A "Developed by `<CodeJBorg />`" pill in the home page footer links to [junaidul.pro.bd/codejborg](https://junaidul.pro.bd/codejborg)
 
 ## Privacy model
 
@@ -104,27 +107,36 @@ This app uses **Vercel Postgres** for persistent storage in production. The free
 
 ### Detailed Deployment Guide
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete deployment instructions.
+See [QUICK_START.md](./QUICK_START.md) for a step-by-step setup.
 
 ## Project Structure
 
 ```
 ├── app/
-│   ├── api/resumes/        # API routes for resumes
-│   ├── create/             # Resume creation page
-│   ├── resume/[id]/        # Resume view page
-│   ├── layout.tsx          # Root layout
-│   ├── page.tsx            # Home page
-│   └── globals.css         # Global styles
+│   ├── api/resumes/              # GET/POST resumes; [id] GET/PUT/DELETE (edit token)
+│   ├── api/ai/                   # Groq routes: generate-summary, improve-bullet, suggest-skills,
+│   │                             # analyze-ats, improvement-report, recommend-template
+│   ├── create/                   # New resume (guided editor)
+│   ├── resume/[id]/              # Read-only view / share page
+│   ├── resume/[id]/edit/         # Edit (needs the edit token)
+│   ├── layout.tsx · page.tsx     # Root layout, home ("My resumes" in this browser)
+│   └── globals.css
 ├── components/
-│   ├── ResumeForm.tsx      # Resume creation form
-│   ├── PrintButton.tsx     # Print/PDF export
-│   └── ShareResume.tsx     # Share functionality
+│   ├── editor/                   # 9-step editor (contact → review), entry cards, AI suggestions
+│   ├── PaperPreview.tsx          # Live page-accurate preview
+│   ├── ResumeDocument.tsx        # Template rendering
+│   ├── AtsScore.tsx · JobMatch.tsx
+│   ├── ResumeToolbar.tsx · ShareResume.tsx · MyResumes.tsx
+│   ├── CreditPill.tsx            # CodeJBorg credit
+│   └── ui/                       # Button, Field, Icon, Logo
 ├── lib/
-│   ├── storage.ts          # Storage abstraction (Postgres/File)
-│   └── schema.sql          # Database schema
+│   ├── storage.ts                # Storage abstraction (Postgres/File)
+│   ├── templates.ts · sections.ts
+│   ├── sanitize.ts · validation.ts · resume-validation.ts
+│   ├── ai-service.ts · ai-client.ts · resume-text.ts · my-resumes.ts
+│   └── schema.sql                # Database schema
 └── types/
-    └── resume.ts           # TypeScript interfaces
+    └── resume.ts                 # TypeScript interfaces
 ```
 
 ## Environment Variables
